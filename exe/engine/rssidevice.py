@@ -24,7 +24,8 @@ An RSS Idevice is one built from a RSS feed.
 
 import re
 
-from exe.engine               import feedparser
+# from exe.engine               import feedparser
+import feedparser
 from exe.engine.idevice       import Idevice
 from exe.engine.field         import TextAreaField
 from exe.engine.translate     import lateTranslate
