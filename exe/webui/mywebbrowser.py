@@ -1,6 +1,8 @@
-#! /usr/bin/python2.7
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+###! /usr/bin/python2.7
 """Interfaces for launching and remotely controlling Web browsers.
-JR: Fichero parcheado de webbrowser.py para que acepte chrome y chromium"""
+JRJ: Fichero parcheado de webbrowser.py para que acepte chrome y chromium"""
 # Maintained by Georg Brandl.
 
 import os
@@ -507,8 +509,8 @@ def register_X_browsers():
     # Grail, the Python browser. Does anybody still use it?
     if _iscommand("grail"):
         register("grail", Grail, None)
-    
-    # JR: Register Google Chrome/Chromium browsers
+
+    # JRJ: Register Google Chrome/Chromium browsers
     for browser in ("google-chrome", "chrome", "chromium", "chromium-browser"):
         if _iscommand(browser):
             register(browser, None, Chrome(browser))

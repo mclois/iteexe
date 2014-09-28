@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/python
 # -*- coding: utf-8 -*-
 # ===========================================================================
 # Bloque para el iDevice "Orientaciones Alumnado" creado para la FPD por 

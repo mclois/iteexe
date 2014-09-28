@@ -1,6 +1,8 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
 
 """
-JR: The StyleManagerPage is responsible for managing styles
+JRJ: The StyleManagerPage is responsible for managing styles
 """
 
 import logging

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/python
 # -*- coding: utf-8 -*-
 # ===========================================================================
 # Bloque para el iDevice "Debes conocer" creado para la FPD por 

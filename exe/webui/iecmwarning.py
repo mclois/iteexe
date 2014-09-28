@@ -1,7 +1,8 @@
-# -- coding: utf-8 --
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
 # ===========================================================================
 # eXe
-# Copyright 2013, Pedro Pe�a P�rez, Open Phoenix IT
+# Copyright 2013, Pedro Peña Pérez, Open Phoenix IT
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
