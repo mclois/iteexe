@@ -1,5 +1,3 @@
-#!/usr/bin/python
-# -*- coding: utf-8 -*-
 # ===========================================================================
 # eXe
 # Copyright 2004-2006, University of Auckland
@@ -299,36 +297,36 @@ class TextAreaElement(ElementWithResources):
         from exe.export.exportmediaconverter import ExportMediaConverter
         mediaConverter = ExportMediaConverter.getInstance()
         htmlContentMediaAdapted = htmlContent
-
+        
         if mediaConverter is not None:
             htmlContentMediaAdapted = mediaConverter.handleAudioVideoTags(htmlContent, mediaParams)
             mediaConverter.handleImageVersions(htmlContentMediaAdapted, mediaParams)
-
+        
         for strToRemove in self.dontCountStrs:
             htmlContentMediaAdapted = htmlContentMediaAdapted.replace(strToRemove, "")
-
+        
         htmlContentMediaAdapted = re.sub(re.compile('<div(.)*?>', re.MULTILINE), '\1', htmlContentMediaAdapted)
-
+        
         htmlContentMediaAdapted = htmlContentMediaAdapted.replace("\n", "")
         htmlContentMediaAdapted = htmlContentMediaAdapted.replace("\r", "")
-
+        
         htmlContentMediaAdapted = htmlContentMediaAdapted.strip()
-
+        
         return htmlContentMediaAdapted
-
-
+    
+    
     def getMediaAdaptedHTML(self):
         from exe.export.exportmediaconverter import ExportMediaConverter
         mediaConverter = ExportMediaConverter.getInstance()
-
+        
         if mediaConverter is not None:
             htmlContentMediaAdapted = mediaConverter.handleAudioVideoTags(self.renderView())
             htmlContentMediaAdapted = mediaConverter.handleImageVersions(htmlContentMediaAdapted)
             return htmlContentMediaAdapted
         else:
             return self.renderView()
-
-
+        
+    
 
     """
     Will determine the type - either has meaningful text and HTML content or 
@@ -336,24 +334,24 @@ class TextAreaElement(ElementWithResources):
     """
     def getXMLType(self):
         htmlContent = self.renderView()
-
+        
         # stop this from being used to run a resize
         htmlContentMediaAdapted = self.getMediaAdaptedStrippedHTML(htmlContent, {"noresize" : True})
-
+        
         imgChars = self._countTagLength(htmlContentMediaAdapted, "img")
         audioChars = self._countTagLength(htmlContentMediaAdapted, "audio", True)
         videoChars = self._countTagLength(htmlContentMediaAdapted, "video", True)
-
+        
         threshHold = 10
-
+        
         "TODO: Make sure that we also look for the audio ..."
         remainingChars = len(htmlContentMediaAdapted) - imgChars - audioChars - videoChars
-
+        
         if remainingChars < threshHold:
             return self.MEDIA_ONLY_SLIDE
         else:
             return self.HTML_SLIDE
-
+        
     """
     Internal helper to count the length of a tag to see if this makes up all
     the content etc. etc.
@@ -363,36 +361,36 @@ class TextAreaElement(ElementWithResources):
         tagStartIndex = htmlContent.find("<" + tagName)
         if tagStartIndex == -1:
             return 0
-
+        
         tagEndIndex = -1
         if endingTag == False:
             tagEndIndex = htmlContent.find(">", tagStartIndex + 1)
         else:
             endingTagStr = "</" + tagName + ">"
             tagEndIndex = htmlContent.find(endingTagStr) + len(endingTagStr)
-
+        
         return (tagEndIndex - tagStartIndex)
-
+    
 
 
 
     def renderXML(self, style, elementToMake = "block", myId = "", title="", icon=""):
         from exe.export.exportmediaconverter import ExportMediaConverter
         from exe.export.xmlpage import XMLPage
-
+        
         xml = u""
-
+        
         if myId == "":
             myId = self.field.idevice.id
-
+        
         XMLPage.lastIdeviceID = myId
-
+        
         xmlType = self.getXMLType()
-
+        
         #if we are using force media slide option
         if ExportMediaConverter.autoMediaOnly == True or ExportMediaConverter.autoMediaOnly == "true":
             xmlType = self.MEDIA_ONLY_SLIDE
-
+        
         if xmlType == self.MEDIA_ONLY_SLIDE:
             xml += u"<%s type='mediaslide' id='%s'>\n" % (elementToMake, myId)
             htmlContentInc = self.getMediaAdaptedStrippedHTML(self.renderView(), {"resizemethod" : "stretch"} )
@@ -400,7 +398,7 @@ class TextAreaElement(ElementWithResources):
             if scriptStart != -1:
                 scriptEnd = htmlContentInc.find("</script>", scriptStart) + len("</script>")
                 htmlContentInc = htmlContentInc[:scriptStart] + htmlContentInc[scriptEnd:]
-
+            
             xml += htmlContentInc
             xml += "</%s>\n" % elementToMake
         else: 
@@ -412,12 +410,12 @@ class TextAreaElement(ElementWithResources):
                 xml += "<img src='icon_" + icon + ".gif' /> "
             if title != "":
                 xml += "<strong>"  + title + "</strong><br/>"
-
+            
             xml += mediaAdaptedHTML
             xml += "]]>"
             xml += "</%s>\n" % elementToMake
-
-
+        
+        
         return xml
 
     def renderView(self, visible=True, class_="block", content=None, preview=False):
@@ -561,7 +559,7 @@ class PlainTextAreaElement(Element):
         """
         if self.id in request.args:
             self.field.content = request.args[self.id][0]
-
+            
 
     def renderEdit(self):
         """
@@ -591,7 +589,7 @@ class PlainTextAreaElement(Element):
         if content is None:
             content = self.field.content
         return content + '<br/>'
-
+    
 # ===========================================================================
 class ImageElement(Element):
     """
@@ -621,7 +619,7 @@ class ImageElement(Element):
         if "height"+self.id in request.args \
         and not is_cancel:
             self.field.height = request.args["height"+self.id][0]
-
+            
         if "action" in request.args and request.args["action"][0]=="addImage" and \
            request.args["object"][0]==self.id:
             self.field.idevice.edit = True
@@ -636,7 +634,7 @@ class ImageElement(Element):
 
         if not self.field.imageResource:
             self.field.setDefaultImage()
-
+            
         function = ""
         if hasattr(self.field, 'isFeedback') and self.field.isFeedback:
             function = "addFeedbackImage"
@@ -669,7 +667,7 @@ class ImageElement(Element):
 
         html += u'<div class="block">'
         html += common.textInput("path"+self.id, "", 50)
-
+        
         html += u'<input type="button" onclick="%s(\'%s\')"' % (function, self.id)
         html += u' value="%s" />' % _(u"Select an image")
         if self.field.imageResource  and not self.field.isDefaultImage:
@@ -722,7 +720,7 @@ class ImageElement(Element):
 
         return html
 
-
+    
 # ===========================================================================
 class MultimediaElement(Element):
     """
@@ -741,10 +739,10 @@ class MultimediaElement(Element):
         """
         if "path"+self.id in request.args:
             self.field.setMedia(request.args["path"+self.id][0])
-
+            
         if "caption" + self.id in request.args:
             self.field.caption = request.args["caption"+self.id][0]
-
+        
 
     def renderEdit(self):
         """
@@ -759,11 +757,11 @@ class MultimediaElement(Element):
         html += common.textInput("path"+self.id, "", 50)
         html += u'<input type="button" onclick="addMp3(\'%s\')"' % self.id
         html += u' value="%s" />' % _(u"Select an MP3")
-
-
+        
+        
         if self.field.mediaResource:
             html += '<p style="color: red;">'+ self.field.mediaResource.storageName + '</P>'
-
+            
         html += '<br/><b>%s</b><br/>' % _(u"Caption:")
         html += common.textInput("caption" + self.id, self.field.caption)
         html += common.elementInstruc(self.field.captionInstruc)+ '<br/>'
@@ -795,7 +793,7 @@ class MultimediaElement(Element):
                                        "xspf_player.swf")
 
         return html
-
+    
     def renderMP3(self, filename, mp3player):
         path = Path(filename)
         fileExtension =path.ext.lower()
@@ -818,11 +816,11 @@ class MultimediaElement(Element):
         bgcolor="#FFFFFF" name="mp3player" type="application/x-shockwave-flash"
         pluginspage="http://www.macromedia.com/go/getflashplayer" height="15" width="400" />
             </object>
-
+        
         """ % {'mp3player': mp3player,
                'url':       filename,
                'caption':   self.field.caption}
-
+        
         wmvStr = common.flash(filename, self.field.width, self.field.height,
                               id="mp3player",
                               params = {
@@ -861,7 +859,7 @@ pluginspage="http://www.microsoft.com/Windows/Downloads/Contents/Products/MediaP
         </embed>
         </object></p>
         """ %(filename, filename)
-
+        
         aviStr = """
         <p class="mediaplugin"><object width="240" height="180">
         <param name="src" value="%s">
@@ -871,7 +869,7 @@ pluginspage="http://www.microsoft.com/Windows/Downloads/Contents/Products/MediaP
         controller="true" autoplay="false"> </embed>
         </object></p>
         """ % (filename, filename)
-
+        
         mpgStr = """
         <p class="mediaplugin"><object width="240" height="180">
         <param name="src" value="%s">
@@ -881,13 +879,13 @@ pluginspage="http://www.microsoft.com/Windows/Downloads/Contents/Products/MediaP
         controller="true" autoplay="false"> </embed>
         </object></p>
         """ % (filename, filename)
-
+        
         wavStr = r"""
         <input type="button" value="Hear it" 
         OnClick="document.getElementById('dummy_%s').innerHTML='<embed src=%s hidden=true loop=false>'"
         <div id="dummy_%s"></div>
         """ % (self.id, filename, self.id)
-
+        
         movStr = """
         <p class="mediaplugin"><object classid="CLSID:02BF25D5-8C17-4B23-BC80-D3488ABDDC6B"
                 codebase="http://www.apple.com/qtactivex/qtplugin.cab" 
@@ -905,7 +903,7 @@ pluginspage="http://www.microsoft.com/Windows/Downloads/Contents/Products/MediaP
         </embed>
         </object></p>
         """ %(filename, filename)
-
+        
         mpgStr = """
         <p class="mediaplugin"><object width="240" height="180">
         <param name="src" value="%s">
@@ -915,7 +913,7 @@ pluginspage="http://www.microsoft.com/Windows/Downloads/Contents/Products/MediaP
         controller="true" autoplay="false"> </embed>
         </object></p>
         """
-
+        
         if fileExtension == ".mp3":
             return mp3Str
         elif fileExtension == ".wav":
@@ -930,7 +928,7 @@ pluginspage="http://www.microsoft.com/Windows/Downloads/Contents/Products/MediaP
             return aviStr
         else:
             return ""
-
+  
 
 #============================================================================
 class AttachmentElement(Element):
@@ -950,8 +948,8 @@ class AttachmentElement(Element):
         """
         if "path"+self.id in request.args:
             self.field.setAttachment(request.args["path"+self.id][0])
-
-
+        
+        
     def renderEdit(self):
         """
         Returns an XHTML string with the form element for editing this field
@@ -959,7 +957,7 @@ class AttachmentElement(Element):
         log.debug("renderEdit")
 
         html  = ""
-
+        
         label = _(u'Filename:')
         if self.field.attachResource:
             label += u': '
@@ -971,9 +969,9 @@ class AttachmentElement(Element):
         html += common.textInput("path"+self.id, "", 50)
         html += u'<input type="button" onclick="addFile(\'%s\')"' % self.id
         html += u' value="%s" /><br/>\n' % _(u"Select a file")
-
+        
         return html
-
+    
     def renderPreview(self):
         """
         Returns an XHTML string for previewing this image
@@ -1005,7 +1003,7 @@ class AttachmentElement(Element):
             html += self.field.attachResource.storageName
             html += u"</a><br/>\n"
         return html
-
+    
 #================================================================================
 
 class MagnifierElement(Element):
@@ -1046,21 +1044,21 @@ class MagnifierElement(Element):
         if "height"+self.id in request.args \
         and not is_cancel:
             self.field.height = request.args["height"+self.id][0]
-
+            
         if "action" in request.args and request.args["action"][0]=="addImage" and \
            request.args["object"][0]==self.id:
             # disabling Undo once an image has been added:
             self.field.idevice.undo = False
             self.field.idevice.edit = True
-
-
+            
+            
 
     def renderEdit(self):
         """
         Returns an XHTML string with the form element for editing this field
         """
         log.debug("renderEdit")
-
+        
         if not self.field.imageResource:
             self.field.setDefaultImage()
 
@@ -1090,7 +1088,7 @@ class MagnifierElement(Element):
             html += '<p style="color: red;">'+ self.field.imageResource.storageName + '</P>'
         if self.field.message <> "":
             html += '<span style="color:red">' + self.field.message + '</span>'
-
+        
         html += u'<div class="block"><b>%s</b>' % _(u"Display as:")
         html += common.elementInstruc(self.field.idevice.dimensionInstruc)
         html += u'</div>\n'
@@ -1140,7 +1138,7 @@ class MagnifierElement(Element):
 
 
         return html
-
+    
     def renderMagnifier(self, imageFile, magnifierFile):
         """
         Renders the magnifier flash thingie
@@ -1161,7 +1159,7 @@ class MagnifierElement(Element):
             html +=u' data-size="%s"  data-zoom="%s" />'% (field.glassSize, field.initialZSize)
             html +=lb
         return html;
-
+        
 
 #============================================================================
 class ClozeElement(ElementWithResources):
@@ -1288,12 +1286,12 @@ class ClozeElement(ElementWithResources):
 
     def renderXML(self):
         from exe.export.exportmediaconverter import ExportMediaConverter
-
+        
         missingWordCount = 0
-
+        
         #array True if numeric only, false otherwise - hint for phone input
         missingWordNumOnly = []
-
+        
         xml =u""
         xml += "<cloze>"
         xml += "<formhtml><![CDATA["
@@ -1303,14 +1301,14 @@ class ClozeElement(ElementWithResources):
                 #remove table formatting... makes midlet life difficult
                 text = text.replace("</td>", "<br/>")
                 text = text.replace("</tr>", "<br/>----<br/>")
-
+                
                 xml += ExportMediaConverter.removeHTMLTags(text, ["table", "tbody", "tr", "td", "th"])
                 breakCount += 1
             if missingWord:
                 #NOTE: To make the midlet's life easier - value MUST come after id
                 #if breakCount > 0:
                 #    xml += "<br/>"
-
+                
                 #check and see if we have a numeric only word
                 numbers = u"0123456789\u06F0\u06F1\u06F2\u06F3\u06F4\u06F5\u06F6\u06F7\u06F8\u06F9"
                 numOnly = True
@@ -1320,19 +1318,19 @@ class ClozeElement(ElementWithResources):
                         #there is something thats not a number
                         numOnly = False
                         break
-
+                
                 missingWordNumOnly.append(numOnly)
-
+                
                 inputStyle = ""
-
-
+                
+                
                 xml += ' <input type="text" size="%s" ' % str(len(missingWord) + 2) \
                     + '        id="clozeBlank%s" ' % str(missingWordCount) \
                     + ' value="clozeBlank%s" ' % str(missingWordCount) \
                     + '    />'
                 missingWordCount = missingWordCount + 1
                 breakCount = 0
-
+        
         xml += "<a href='#'>Check</a>"
         xml += "]]></formhtml>"
         xml += "<words>"
@@ -1342,20 +1340,20 @@ class ClozeElement(ElementWithResources):
                 xml += "<word id='%(id)s' value='%(ans)s'/>\n" % \
                     {"id": str(missingWordCount), "ans" : missingWord}
                 missingWordCount = missingWordCount + 1
-
+        
         xml += "</words>"
         xml += "<format>"
         for i in range(missingWordCount):
             formatStr = "ABC,abc,123"
             if missingWordNumOnly[i] == True:
                 formatStr = "123"
-
+                
             xml += "<wordformat id='%(id)s' value='%(format)s'/>" \
                 % {"id" : str(i), "format" : formatStr }
         xml += "</format>"
-
+        
         xml += "</cloze>"
-
+        
         return xml
 
     def renderView(self, feedbackId=None, preview=False):
@@ -1368,7 +1366,7 @@ class ClozeElement(ElementWithResources):
             sectionTag = "section"        
 
         html = ['<%s class="activity" id="activity-%s">' % (sectionTag,self.id)]
-
+        
         if preview: 
             # to render, use the content with the preview-able resource paths:
             self.field.encodedContent = self.field.content_w_resourcePaths
@@ -1461,7 +1459,7 @@ class ClozeElement(ElementWithResources):
             html += ['</form>']
         html += ['</%s>' % sectionTag]
         return '\n'.join(html)
-
+    
     def renderText(self):
         """
         Shows the text with gaps for text file export
@@ -1473,9 +1471,9 @@ class ClozeElement(ElementWithResources):
             if missingWord:
                 for x in missingWord:
                     html += "_"
-
+                    
         return html
-
+    
     def renderAnswers(self):        
         """
         Shows the answers for text file export
@@ -1491,7 +1489,7 @@ class ClozeElement(ElementWithResources):
             html += answers +'</p>'
         else:
             html = ""
-
+                
         return html
 
 #============================================================================
@@ -1713,7 +1711,7 @@ class ClozelangElement(ElementWithResources):
         html += ['</div>\n']
         html += ['<div id="clozelangScore%s"></div>' % self.id]
         return '\n'.join(html) + '</div>'
-
+    
     def renderText(self):
         """
         Shows the text with gaps for text file export
@@ -1725,9 +1723,9 @@ class ClozelangElement(ElementWithResources):
             if missingWord:
                 for x in missingWord:
                     html += "_"
-
+                    
         return html
-
+    
     def renderAnswers(self):        
         """
         Shows the answers for text file export
@@ -1743,7 +1741,7 @@ class ClozelangElement(ElementWithResources):
             html += answers +'</p>'
         else:
             html = ""
-
+                
         return html
 
 # ===========================================================================
@@ -1903,7 +1901,7 @@ class FlashMovieElement(Element):
                                  self.field.width,
                                  self.field.height,
                                  autoplay='true')
-
+                                 
 
         return html
 
@@ -1932,7 +1930,7 @@ class MathElement(Element):
             not(request.args[u"action"][0] == u"delete" and 
                 request.args[u"object"][0]==self.field.idevice.id):
             self.field.latex = request.args['input'+self.id][0]         
-
+        
 
 
     def renderEdit(self):
@@ -1990,7 +1988,7 @@ class MathElement(Element):
         html += "</select>\n"
         html += "</div>\n"
         html += common.textArea('input'+self.id, self.field.latex)
-
+        
         # Preview
         html += '<div class="block">\n'
         html += common.submitButton('preview'+self.id, _('Preview'))
@@ -2057,10 +2055,10 @@ class SelectOptionElement(Element):
         log.debug("process " + repr(request.args))
 
         is_cancel = common.requestHasCancel(request)
-
+        
         if self.answerId in request.args:
             self.answerElement.process(request)
-
+                        
         if "c"+self.id in request.args \
         and not is_cancel:
             self.field.isCorrect = True 
@@ -2068,7 +2066,7 @@ class SelectOptionElement(Element):
         elif "ans"+self.id in request.args \
         and not is_cancel:
             self.field.isCorrect = False
-
+            
         if "action" in request.args and \
            request.args["action"][0] == "del"+self.id:
             # before deleting the option object, remove any internal anchors:
@@ -2084,7 +2082,7 @@ class SelectOptionElement(Element):
         Returns an XHTML string for editing this option element
         code is pretty much straight from the Multi-Option aka QuizOption
         """
-        html  = u"<tr><td align=\"left\"><b>%s</b>" % _("Option")
+        html  = u"<tr><td align=\"left\"><b id='ans%s-editor-label'>%s</b>" % (self.id,_("Option"))
         html += common.elementInstruc(self.field.question.optionInstruc)
 
         header = ""
@@ -2110,7 +2108,7 @@ class SelectOptionElement(Element):
         html += common.richTextArea("ans"+self.id, 
                           self.answerElement.field.content_w_resourcePaths,
                           package=this_package)
-
+        
         html += "</td><td align=\"center\">\n"
         html += common.checkbox("c"+self.id, 
                               self.field.isCorrect, self.index)
@@ -2129,13 +2127,13 @@ class SelectOptionElement(Element):
         """
         log.debug("renderView called with preview = " + str(preview))
         ident = self.field.question.id + str(self.index)
-
+        
         lb = "\n" #Line breaks
         dT = common.getExportDocType()
         sectionTag = "div"
         if dT == "HTML5":
             sectionTag = "section"        
-
+        
         html = '<'+sectionTag+' class="iDevice_answer">'+lb
         # Checkbox
         html += '<p class="iDevice_answer-field js-required">'+lb
@@ -2153,16 +2151,16 @@ class SelectOptionElement(Element):
         else:
             html += self.answerElement.renderView()
         html += '</div>'+lb
-
+            
         # Answer feedback
         html += '<'+sectionTag+' class="iDevice_answer-feedback feedback" id="feedback-'+ident+'" style="display:none"></'+sectionTag+'>'+lb
-
+        
         html += '</'+sectionTag+'>'+lb
-
+        
         return html
 
     def renderNoscript(self, preview):
-
+    
         lb = "\n" #Line breaks
         html = '<li><a href="#answer-'+self.id+'" class="'
         if self.field.isCorrect == True:
@@ -2172,9 +2170,9 @@ class SelectOptionElement(Element):
             html += 'wrong">'
             html += c_("Incorrect")
         html += '</a></li>'+lb
-
+    
         return html    
-
+    
 # ===========================================================================
 class SelectquestionElement(Element):
     """
@@ -2182,7 +2180,7 @@ class SelectquestionElement(Element):
     Used by QuizTestBlock
     Which is used as part of the Multi-Select iDevice.
     """
-
+            
     def __init__(self, field):
         """
         Initialize
@@ -2195,7 +2193,7 @@ class SelectquestionElement(Element):
             field.questionTextArea.idevice = idevice
         if field.feedbackTextArea.idevice is None: 
             field.feedbackTextArea.idevice = idevice
-
+            
         field.questionTextArea.class_ = "block question"
         field.questionTextArea.htmlTag = "div"
 
@@ -2221,18 +2219,18 @@ class SelectquestionElement(Element):
         log.info("process " + repr(request.args))
 
         is_cancel = common.requestHasCancel(request)
-
+        
         if self.questionId in request.args:
             self.questionElement.process(request)
-
+            
         if ("addOption"+unicode(self.id)) in request.args: 
             self.field.addOption()
             self.field.idevice.edit = True
             self.field.idevice.undo = False
-
+            
         if self.feedbackId in request.args:
             self.feedbackElement.process(request)
-
+            
         if "action" in request.args and \
            request.args["action"][0] == "del" + self.id:
             # before deleting the questions object, remove any internal anchors:
@@ -2251,7 +2249,7 @@ class SelectquestionElement(Element):
         Returns an XHTML string with the form element for editing this element
         """
         html  = u"<div class=\"iDevice\">\n"
-        html += u"<b>" + _("Question:") + " </b>" 
+        html += u"<b id='question"+self.id+"-editor-label'>" + _("Question:") + " </b>" 
         html += common.elementInstruc(self.field.questionInstruc)
         html += u" " + common.submitImage("del" + self.id, 
                                    self.field.idevice.id, 
@@ -2283,10 +2281,10 @@ class SelectquestionElement(Element):
         html += u"</thead>"
         html += u"<tbody>"
 
-
+        
         for element in self.options:
             html += element.renderEdit() 
-
+            
         html += u"</tbody>"
         html += u"</table>\n"
 
@@ -2342,7 +2340,7 @@ class SelectquestionElement(Element):
             sectionTag = "section"
             titleTag1 = "h1"
             titleTag2 = "h1"
-
+        
         html = '<div id="actitity-'+self.id+'">'+lb
         # Form
         if preview: 
@@ -2353,14 +2351,14 @@ class SelectquestionElement(Element):
             html += '<form name="multi-select-form-'+self.id+'" action="#" onsubmit="return false" class="activity-form">'+lb
             html += '<'+titleTag1+' class="js-sr-av">' + c_("Question")+'</'+titleTag1+'>'+lb           
             html += self.questionElement.renderView()        
-
+            
         # Answers
         html += '<'+sectionTag+' class="iDevice_answers">'+lb
         html += '<'+titleTag2+' class="js-sr-av">' + c_("Answers")+'</'+titleTag2+'>'+lb
         for element in self.options:
             html += element.renderView(preview)      
         html += "</"+sectionTag+">"+lb
-
+            
         # Feedback button
         html += '<div class="block iDevice_buttons feedback-button js-required">'+lb
         html += '<p>'+lb
@@ -2368,7 +2366,7 @@ class SelectquestionElement(Element):
         html += lb
         html += '</p>'+lb
         html += '</div>'+lb
-
+        
         # Feedback
         html += '<'+sectionTag+' id="%s" class="js-hidden js-feedback">' % ("f"+self.field.id)
         html += lb
@@ -2383,7 +2381,7 @@ class SelectquestionElement(Element):
         else:
             html += ""
         html += '</'+sectionTag+'>'+lb
-
+        
         # /Form
         if preview:
             html += '</div>'+lb
@@ -2398,12 +2396,12 @@ class SelectquestionElement(Element):
             html += element.renderNoscript(preview)
         html += "</ol>"+lb
         html += "</"+sectionTag+">"+lb
-
+        
         html += "</div>"+lb
 
-        return html
+        return html       
 
-
+    
 # ===========================================================================
 class QuizOptionElement(Element):
     """
@@ -2441,13 +2439,13 @@ class QuizOptionElement(Element):
         log.debug("process " + repr(request.args))
 
         is_cancel = common.requestHasCancel(request)
-
+        
         if self.answerId in request.args:
             self.answerElement.process(request)
-
+            
         if self.feedbackId in request.args:
             self.feedbackElement.process(request)
-
+                        
         if ("c"+self.field.question.id in request.args \
         and request.args["c"+self.field.question.id][0]==str(self.index) \
         and not is_cancel):
@@ -2455,7 +2453,7 @@ class QuizOptionElement(Element):
         elif "ans"+self.id in request.args \
         and not is_cancel:
             self.field.isCorrect = False
-
+            
         if "action" in request.args and \
            request.args["action"][0] == "del"+self.id:
             # before deleting the option object, remove any internal anchors:
@@ -2497,7 +2495,7 @@ class QuizOptionElement(Element):
         html += common.richTextArea("ans"+self.id, 
                           self.answerElement.field.content_w_resourcePaths,
                           package=this_package)
-
+        
         html += "</td><td align=\"center\">\n"
         html += common.option("c"+self.field.question.id, 
                               self.field.isCorrect, self.index)   
@@ -2510,7 +2508,7 @@ class QuizOptionElement(Element):
         html += "<tr><td align=\"left\"><b>%s</b>" % _("Feedback")
         html += common.elementInstruc(self.field.idevice.feedbackInstruc)
         html += "</td><td></td></tr><tr><td colspan=2>\n" 
- 
+         
         # likewise, rather than using feedbackElement.renderEdit(),
         # access the appropriate content_w_resourcePaths attribute directly,
         # since this is in a customised output format 
@@ -2524,11 +2522,11 @@ class QuizOptionElement(Element):
         html += common.richTextArea('f'+self.id, 
                          self.feedbackElement.field.content_w_resourcePaths,
                          package=this_package)
-
+         
         html += "</td></tr>\n"
 
         return html
-
+    
     def renderXML(self):
         from exe.export.xmlexport import remove_html_tags
         from exe.export.exportmediaconverter import ExportMediaConverter
@@ -2536,7 +2534,7 @@ class QuizOptionElement(Element):
         xml += "\n<![CDATA[\n"
         xml += self.answerElement.renderView()
         xml += "\n]]>\n"
-
+        
         #convert any audio tags etc. that have been found for the current profile
         feedbackMediaAdapted = ExportMediaConverter.getInstance().handleAudioVideoTags(\
                                self.feedbackElement.renderView())
@@ -2545,10 +2543,10 @@ class QuizOptionElement(Element):
         xml += ExportMediaConverter.trimHTMLWhiteSpace(self.feedbackElement.renderView())
         xml += "]]></feedback>\n"
         xml += "</answer>\n\n"
-
+        
         return xml
 
-
+    
     def renderAnswerView(self, preview=False):
         """
         Returns an XHTML string for viewing and previewing this option element
@@ -2558,10 +2556,10 @@ class QuizOptionElement(Element):
         sectionTag = "div"
         if dT == "HTML5":
             sectionTag = "section"        
-
+        
         length = len(self.field.question.options)
         html = '<'+sectionTag+' class="iDevice_answer">'+lb
-
+        
         html += '<p class="iDevice_answer-field js-required">'+lb
         html += '<label for="i'+self.id+'" class="sr-av"><a href="#answer-'+self.id+'">' + c_("Option")+' '+str(self.index+1)+'</a></label>'
         html += '<input type="radio" name="option%s" ' % self.field.question.id
@@ -2569,17 +2567,17 @@ class QuizOptionElement(Element):
         html += 'onclick="getFeedback(%d,%d,\'%s\',\'multi\')"/>' % (self.index, length, self.field.question.id)
         html += lb
         html += '</p>'+lb
-
+        
         html += '<div class="iDevice_answer-content" id="answer-'+self.id+'">'
         if dT != "HTML5":
             html += '<a name="answer-'+self.id+'"></a>'+lb
-
+        
         if preview:
             html += self.answerElement.renderPreview()
         else:
             html += self.answerElement.renderView()
         html += "</div>"+lb
-
+        
         html += "</"+sectionTag+">"+lb
 
         return html    
@@ -2611,9 +2609,9 @@ class QuizOptionElement(Element):
         html += lb
         html += feedbackStr
         html += '</'+sectionTag+'>'+lb
-
+        
         return html
-
+        
     # noscript
     def renderNoscript(self, preview):
         lb = "\n" #Line breaks
@@ -2630,7 +2628,7 @@ class QuizOptionElement(Element):
         else:
             html += self.feedbackElement.field.content_wo_resourcePaths
         '''
-        return html
+        return html     
 
 # ===========================================================================
 
@@ -2640,7 +2638,7 @@ class QuizQuestionElement(Element):
     Used by QuizTestBlock
     Which is used as part of the Multi-Choice iDevice.
     """
-
+            
     def __init__(self, field):
         """
         Initialize
@@ -2653,7 +2651,7 @@ class QuizQuestionElement(Element):
             field.questionTextArea.idevice = idevice
         if field.hintTextArea.idevice is None: 
             field.hintTextArea.idevice = idevice
-
+            
         field.questionTextArea.class_ = "block question"
         field.questionTextArea.htmlTag = "div"
 
@@ -2677,20 +2675,20 @@ class QuizQuestionElement(Element):
         Process the request arguments from the web server
         """
         log.info("process " + repr(request.args))
-
+        
         if self.questionId in request.args: 
             self.questionElement.process(request)
-
+            
         if self.hintId in request.args: 
             self.hintElement.process(request)
-
+            
         if ("addOption"+unicode(self.id)) in request.args: 
             self.field.addOption()
             self.field.idevice.edit = True
             # disable Undo once an option has been added:
             self.field.idevice.undo = False
-
-
+            
+            
         if "action" in request.args and \
            request.args["action"][0] == "del" + self.id:
             # before deleting the question object, remove any internal anchors:
@@ -2722,7 +2720,7 @@ class QuizQuestionElement(Element):
 
         for element in self.options:
             html += element.renderEdit() 
-
+            
         html += "</tbody>"
         html += "</table>\n"
 
@@ -2749,31 +2747,31 @@ class QuizQuestionElement(Element):
     def renderXML(self):
         from exe.export.xmlexport import remove_html_tags
         from exe.export.exportmediaconverter import ExportMediaConverter
-
+        
         questionStr = self.questionElement.renderView()
         questionMediaAdjusted = ExportMediaConverter.getInstance().handleAudioVideoTags(questionStr)
-
+        
         #this causes a formatting problem with LWUIT HTMLComponent for some reason
         questionMediaAdjusted = questionMediaAdjusted.replace("align=\"right\"", "")
-
-
+        
+        
         audioStr = ""
         audioURL = ExportMediaConverter.getInstance().findAutoAudio(questionMediaAdjusted)
         if audioURL is not None:
             audioStr = " audio='%s' " % audioURL
-
-
+        
+        
         xml = u"<question %s>" % audioStr
         xml += "<![CDATA["
         xml += questionMediaAdjusted
         xml += "]]>\n"
         for element in self.options:
             xml += element.renderXML() + "\n"
-
-
+            
+        
         xml += "</question>"
         return xml
-
+    
 
     def renderPreview(self, img1=None, img2=None):
         """ 
@@ -2784,7 +2782,7 @@ class QuizQuestionElement(Element):
         html += self.doRender(img1, img2, preview=True)
         html += "</div>"+lb
         return html
-
+    
     def doRender(self, img1, img2, preview=False):
         """
         Returns an XHTML string for viewing this element
@@ -2820,7 +2818,7 @@ class QuizQuestionElement(Element):
         for element in self.options:
             html += element.renderAnswerView(preview)
         html += "</"+sectionTag+">"+lb
-
+                
         # Feedbacks
         html += '<'+sectionTag+' class="iDevice_feedbacks js-feedback">'+lb
         html += '<'+titleTag2+' class="js-sr-av">' + c_("Feedback")+'</'+titleTag2+'>'+lb
@@ -2832,7 +2830,7 @@ class QuizQuestionElement(Element):
             html += '</div>'+lb
         else:
             html += '</form>'+lb
-
+        
         # noscript
         html += '<'+sectionTag+' class="iDevice_solution feedback js-hidden">'+lb
         html += "<"+titleTag2+">" + c_("Solution")+"</"+titleTag2+">"+lb
