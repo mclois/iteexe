@@ -1,4 +1,3 @@
-#!/usr/bin/python
 # ===========================================================================
 # eXe 
 # Copyright 2004-2006, University of Auckland
@@ -238,14 +237,14 @@ class Block(Renderable):
             _(u"Delete"), 1)
 
         if self.idevice.isFirst():
-            html += common.image(u"movePrev", u"/images/stock-go-up-off.png")
+            html += common.image(u"movePrev", u"/images/stock-go-up-off.png", 16, 16, None, u"submit")
         else:
             html += common.submitImage(u"movePrev", self.id, 
                                        u"/images/stock-go-up.png", 
                                        _(u"Move Up"),1)
 
         if self.idevice.isLast():
-            html += common.image(u"moveNext", u"/images/stock-go-down-off.png")
+            html += common.image(u"moveNext", u"/images/stock-go-down-off.png", 16, 16, None, u"submit")
         else:
             html += common.submitImage(u"moveNext", self.id, 
                                        u"/images/stock-go-down.png", 
@@ -339,4 +338,3 @@ class Block(Renderable):
             _(u"Delete"), 1)
         html += '</p>'
         return html
-# ===========================================================================
