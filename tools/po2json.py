@@ -91,7 +91,7 @@ Here is an example using Pyramid and Genshi:
 .. code-block:: html
 
       <script py:if="not locale_code.startswith('en')" type='text/javascript'
-        src="${static_url('static/js/i18n/{}.js'.format(locale_code))}"
+        src="${static_url('static/js/i18n/{0}.js'.format(locale_code))}"
         ></script>
       <script py:if="locale_code.startswith('en')" type='text/javascript'
         src="${static_url('static/js/i18n/transecma.js')}"></script>
@@ -105,7 +105,7 @@ its functions, especially interpol().
 
 
 from __future__ import (absolute_import, division, print_function,
-    unicode_literals)
+                        unicode_literals)
 import os
 import re
 
@@ -139,15 +139,15 @@ def extract_jquery_templates(fileobj, keywords, comment_tags, options):
              tuples
     :rtype: ``iterator``
     '''
-    # print('Keywords: {}. Options: {}'.format(keywords, options))
+    # print('Keywords: {0}. Options: {1}'.format(keywords, options))
     encoding = options.get('encoding', 'utf-8')
     comments = []
-    funcname = message = None
+    funcname = None
 
     def new_regex(keyword, quote):
         # TODO: Allow plural messages, too
         return re.compile(
-            keyword + \
+            keyword +
             "\(" +     # open parentheses to call function
             quote +    # string start
             # TODO: Allow an escaped quote:
@@ -221,15 +221,14 @@ def compile_dir(dir, domain, out_dir, variable_name=None, use_fuzzy=None,
     if not exists(out_dir):
         os.makedirs(out_dir)
     for locale in os.listdir(dir):
-	po_path = os.path.join(dir, locale, 'LC_MESSAGES', domain + '.po')
-        #po_path = os.path.join(dir, locale, domain + '_' + locale + '.po')
+        po_path = os.path.join(dir, locale, 'LC_MESSAGES', domain + '.po')
         if os.path.exists(po_path):
             out_path = os.path.join(out_dir, locale + '.js')
             jobs.append((locale, po_path, out_path))
     for locale, po_path, out_path in jobs:
         print('    Creating {0}'.format(out_path))
-        s = po2json(po_path, locale, variable_name=variable_name,
-            use_fuzzy=use_fuzzy)
+        s = po2json(
+            po_path, locale, variable_name=variable_name, use_fuzzy=use_fuzzy)
         with codecs.open(out_path, 'w', encoding=encoding) as writer:
             writer.write(s)
             if include_lib:
@@ -253,7 +252,8 @@ def po2json_command():
         po2json -h
     '''
     from argparse import ArgumentParser
-    p = ArgumentParser(description='Converts .po files into .js files ' \
+    p = ArgumentParser(
+        description='Converts .po files into .js files '
         'for web application internationalization.')
     p.add_argument('--domain', '-D', dest='domain', default='js',
                    help="domain of PO files (default '%(default)s')")
@@ -261,14 +261,16 @@ def po2json_command():
                    metavar='DIR', help='base directory of catalog files')
     p.add_argument('--output-dir', '-o', dest='out_dir', metavar='DIR',
                    help="name of the output directory for .js files")
-    p.add_argument('--use-fuzzy', '-f', dest='use_fuzzy', action='store_true',
-                   default=False,
-                   help='also include fuzzy translations (default %(default)s)')
+    p.add_argument(
+        '--use-fuzzy', '-f', dest='use_fuzzy', action='store_true',
+        default=False,
+        help='also include fuzzy translations (default %(default)s)')
     p.add_argument('--variable', '-n', dest='variable_name',
                    default='translations',
                    help="javascript variable name for the translations object")
-    p.add_argument('--include-lib', '-i', dest='include_lib', default=False,
-                action='store_true', help='include transecma.js in the output')
+    p.add_argument(
+        '--include-lib', '-i', dest='include_lib', default=False,
+        action='store_true', help='include transecma.js in the output')
     d = p.parse_args()
     if not d.dir:
         p.print_usage()
