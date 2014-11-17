@@ -90,6 +90,9 @@ Ext.define('eXe.controller.Toolbar', {
             '#file_export_website': {
                 click: { fn: this.processExportEvent, exportType: "webSite" }
             },
+            '#file_export_googledrive': {
+                click: { fn: this.startExportGoogleDrive}
+            },
             '#file_export_zip': {
                 click: { fn: this.processExportEvent, exportType: "zipFile" }
             },
@@ -604,6 +607,31 @@ Ext.define('eXe.controller.Toolbar', {
     processExportEvent: function(menu, item, e, eOpts) {
         this.saveWorkInProgress();
         this.exportPackage(e.exportType, "");
+    },
+
+    startExportGoogleDrive: function(menu, item, e, eOpts) {
+        this.saveWorkInProgress();
+        // Try inmediate authorization (will succeed is user has already authorized eXe)
+        gapi.auth.authorize(
+                {'client_id': GOOGLE_API_CLIENT_ID, 'scope': GOOGLE_API_SCOPES.join(' '), 'immediate': true},
+                this.processExportGoogleDrive);
+    },
+    
+    processExportGoogleDrive : function (authResult) {
+        if (!authResult || authResult.error == 'immediate_failed') {
+            // No access token could be retrieved, force the authorization flow.
+            // This will open a pop-up window, on wich it the Google auth pages
+            // will be loaded. After authorization the user will be redirected
+            // to eXe's callback URI. The script on that URI must take access_token
+            // from URL and call the appropiate function in this page
+            gapi.auth.authorize(
+                  {'client_id': GOOGLE_API_CLIENT_ID, 'scope': GOOGLE_API_SCOPES.join(' '), 'redirect_uri' : GOOGLE_API_REDIRECT_URI, 'immediate': false},
+                  this.processExportGoogleDrive);
+        }
+        else {
+            // Access token has been successfully retrieved, requests can be sent to the API
+            nevow_clientToServerEvent('exportGoogleDrive', this, '', authResult.access_token, navigator.userAgent);
+        }
     },
     
 	exportPackage: function(exportType, exportDir) {
