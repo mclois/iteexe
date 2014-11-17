@@ -1,0 +1,11 @@
+@startuml
+start
+->Publish in Google Drive;
+#fafafa:Google login;
+->User signs in;
+#fafafa:App scopes overview;
+->User authorizes app;
+#fafff0:Export web site;
+#fafff0:Upload to Drive;
+stop
+@enduml
