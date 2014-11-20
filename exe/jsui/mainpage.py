@@ -64,14 +64,7 @@ from exe.engine.lom import lomsubs
 from exe.engine.lom.lomclassification import Classification
 import zipfile
 
-import httplib2
-from oauth2client.client     import AccessTokenCredentials
-from apiclient import errors
-from apiclient.discovery import build
-from apiclient.http import MediaFileUpload
-
 log = logging.getLogger(__name__)
-
 
 class MainPage(RenderableLivePage):
     """
@@ -772,21 +765,14 @@ class MainPage(RenderableLivePage):
     def handleExportGoogleDrive(self, client, auth_token, user_agent):
         """
         Called by js
-        Creates an authorized HTTP conexion, exports the current package as
-        'webSite' to a temporary directory and uploads the exported files to
-        Google Drive
+        Exports the current page as webSite and starts the upload to GDrive
         """ 
         try:
-            credentials = AccessTokenCredentials(auth_token, user_agent)
-            http = httplib2.Http()
-            http = credentials.authorize(http)
-            
             stylesDir  = self.config.stylesDir/self.package.style
-            #exportDir = TempDirPath()
-            exportDir = Path(mkdtemp())
+            
             # Export full website, but do not show result to client
-            outputDir = self.exportWebSite(None, exportDir, stylesDir)
-            self.exportGoogleDrive(client, outputDir, http)
+            websiteExport = WebsiteExport(self.config, stylesDir, None)
+            websiteExport.exportGoogleDrive(self.package, client, auth_token, user_agent)
             
         except Exception, e:
             log.error('An error occured when exporting package to Google Drive')
@@ -1091,7 +1077,7 @@ class MainPage(RenderableLivePage):
                 if client:
                     client.alert(_(u'Filename %s is a file, cannot replace it') % 
                              filename)
-                log.error("Couldn't export web page: "+
+                log.error("Couldn't export web page: " +
                           "Filename %s is a file, cannot replace it" % filename)
                 return
             else:
@@ -1112,70 +1098,6 @@ class MainPage(RenderableLivePage):
             self._startFile(filename)
         else :
             return filename
-
-    def exportGoogleDrive(self, client, exportDir, AuthorizedHttp):
-        def insertFile(drive, filename, meta):
-            media_body = MediaFileUpload(filename, mimetype='text/html', resumable=True)
-            inserted_file = drive.files().insert(body=meta, media_body=media_body).execute()
-            
-            return inserted_file
-            
-        def insertFile_onFail(resp):
-            client.alert(_(u'Failed exporting to GoogleDrive: %s') % str(resp))
-            
-        def insertFile_onSuccess(gfile):
-            client.alert(_(u'Exported to GoogleDrive: %s') % gfile['webContentLink'])
-                
-        def publicFolder(drive, folder_name):
-            """
-            Creates a Public Web folder, that can be read as a web site with any
-            web browser, and populates it with the content of the given directory
-            """
-            
-            # Create public folder
-            body = {
-                'title': folder_name,
-                'mimeType': 'application/vnd.google-apps.folder'
-            }
-            public_folder = drive.files().insert(body=body).execute()
-            
-            permission = {
-                'value': '',
-                'type': 'anyone',
-                'role': 'reader'
-            }
-            drive.permissions().insert(fileId=public_folder['id'], body=permission).execute()
-            
-            return public_folder
-            
-        def publicFolder_onFail(resp):
-            client.alert(_(u'Failed exporting to GoogleDrive: %s') % str(resp))
-            
-        def publicFolder_onSuccess(public_folder):
-            client.alert(_(u'Exported to GoogleDrive: %s') % (public_folder['title']))
-            
-            # Subir archivos a la carpeta pública
-            filename = 'index.html'
-            filepath = os.path.join(exportDir, filename)
-            meta = {
-              'title': filename,
-              'description': 'Fichero exportado',
-              'mimeType': 'text/html',
-              'parents' : [{'id' : public_folder['id']}]
-            }
-            upload_content_d = threads.deferToThread(insertFile, drive_service, filepath, meta)
-            upload_content_d.addCallbacks(insertFile_onSuccess, insertFile_onFail)
-            
-        try:
-            drive_service = build('drive', 'v2', http=AuthorizedHttp)
-            
-            public_folder_d = threads.deferToThread(publicFolder, drive_service, self.package.name)
-            public_folder_d.addCallbacks(publicFolder_onSuccess, publicFolder_onFail)
-
-        except Exception, e:
-            client.alert(_('EXPORT FAILED!\n%s') % str(e))
-            raise
-        #client.alert(_(u'Exported to %s') % filename)
 
     def exportWebZip(self, client, filename, stylesDir):
         try:

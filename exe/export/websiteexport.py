@@ -32,8 +32,18 @@ from zipfile                  import ZipFile, ZIP_DEFLATED
 from exe.webui                import common
 from exe                      import globals as G
 import os
+import mimetypes
+from tempfile                    import mkdtemp
 from exe.engine.persist import encodeObject
 from exe.engine.persistxml import encodeObjectToXML
+
+from twisted.internet            import threads
+
+import httplib2
+from oauth2client.client     import AccessTokenCredentials
+from apiclient import errors
+from apiclient.discovery import build
+from apiclient.http import MediaFileUpload
 
 log = logging.getLogger(__name__)
 
@@ -59,6 +69,107 @@ class WebsiteExport(object):
         self.prefix          = prefix
         self.report          = report
         self.styleSecureMode = config.styleSecureMode
+        
+    def exportGoogleDrive(self, package, client, auth_token, user_agent):
+        """
+        Creates an authorized HTTP conexion, exports the current package as
+        'webSite' to a temporary directory and uploads the exported files to
+        Google Drive
+        """
+        def insertFile(public_folder, drive, upload_file):
+            """
+            Creates the deferred that will upload files to the public folder
+            once it is created
+            """
+            upload_content_d = threads.deferToThread(uploadContent, public_folder, drive, upload_file)
+            upload_content_d.addCallbacks(uploadContent_onSuccess, uploadContent_onFail)
+            
+            return upload_content_d
+        
+        def uploadContent(public_folder, drive, upload_file):
+            """
+            Uploads one file to the given GDrive folder
+            """
+            filepath = os.path.join(self.filename, upload_file)
+            filetype = mimetypes.guess_type(filepath, False)
+            if filetype[0] is not None :
+                mimetype = filetype[0]
+                meta = {
+                  'title': upload_file,
+                  'mimeType': mimetype,
+                  'parents' : [{'id' : public_folder['id']}]
+                }
+                media_body = MediaFileUpload(filepath, mimetype, resumable=True)
+                inserted_file = drive.files().insert(body=meta, media_body=media_body).execute()
+            
+            return public_folder
+            
+        def uploadContent_onFail(err):
+            client.alert(_(u'Failed exporting to GoogleDrive: %s') % str(err))
+            return err
+            
+        def uploadContent_onSuccess(public_folder):
+            client.alert(_(u'Exported to GoogleDrive: %s') % public_folder['title'])
+            return public_folder
+                
+        def publicFolder(drive, folder_name):
+            """
+            Creates a Public Web folder, that can be read as a web site with any
+            web browser, and populates it with the content of the given directory
+            """
+            
+            # Create public folder
+            body = {
+                'title': folder_name,
+                'mimeType': 'application/vnd.google-apps.folder'
+            }
+            public_folder = drive.files().insert(body=body).execute()
+            
+            permission = {
+                'value': '',
+                'type': 'anyone',
+                'role': 'reader'
+            }
+            drive.permissions().insert(fileId=public_folder['id'], body=permission).execute()
+            
+            return public_folder
+            
+        def publicFolder_onFail(err):
+            client.alert(_(u'Failed exporting to GoogleDrive: %s') % str(err))
+            return err
+            
+        def publicFolder_onSuccess(public_folder):
+            client.alert(_(u'Exported to GoogleDrive: %s') % (public_folder['title']))
+            return public_folder
+            
+        try:
+            # Creates a new temporary dir to export the package to, it will be deleted
+            # once the export process is finished
+            self.filename = Path(mkdtemp())
+            outputDir = self.export(package)
+            
+            credentials = AccessTokenCredentials(auth_token, user_agent)
+            http = httplib2.Http()
+            http = credentials.authorize(http)
+            drive_service = build('drive', 'v2', http=http)
+            
+            publicFolder_d = threads.deferToThread(publicFolder, drive_service, package.name)
+            publicFolder_d.addCallbacks(publicFolder_onSuccess, publicFolder_onFail)
+            
+            # Loop through files in exportDir, each upload will be called from
+            # a chained callback function. These callbacks will return a 
+            # deferred so the file N upload will start when file N-1 has 
+            # successfully called its own callback 
+            # (Deferred chain, see: http://krondo.com/?p=2159#attachment_2196)
+            for upload_file in os.listdir(outputDir):
+                publicFolder_d.addCallback(insertFile, drive_service, upload_file)
+            
+            # TODO clean exportDir after uploading has finished
+            
+        except Exception, e:
+            client.alert(_('EXPORT FAILED!\n%s') % str(e))
+            raise
+        #client.alert(_(u'Exported to %s') % filename)
 
     def exportZip(self, package):
         """ 
@@ -159,6 +270,8 @@ class WebsiteExport(object):
                 self.copyFiles(package, outputDir)
         else:
             self.filename.write_text(self.report, 'utf-8')
+            
+        return outputDir
 
 
     def copyFiles(self, package, outputDir):
