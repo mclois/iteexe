@@ -536,7 +536,7 @@ class FeedbackElement(ElementWithResources):
 
         html = ""
         if self.field.feedback != "": 
-            html += common.feedbackBlock(self.id,self.field.feedback)
+            html += common.feedbackBlock(self.id,self.field.feedback,self.field.buttonCaption)
         return html
 
 
