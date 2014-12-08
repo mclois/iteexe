@@ -109,7 +109,7 @@ class WebsiteExport(object):
             return err
             
         def uploadContent_onSuccess(public_folder):
-            client.alert(_(u'Exported to GoogleDrive: %s') % public_folder['title'])
+            #client.alert(_(u'Exported to GoogleDrive: %s') % public_folder['title'])
             return public_folder
                 
         def publicFolder(drive, folder_name):
