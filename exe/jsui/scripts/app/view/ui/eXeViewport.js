@@ -23,7 +23,7 @@ Ext.define('eXe.view.ui.eXeViewport', {
         'eXe.view.ui.eXeToolbar',
         'eXe.view.ui.MainTabPanel',
         'eXe.view.ui.LeftPanel',
-        'Ext.ux.Notification'
+        'Ext.ux.window.Notification'
     ],
 
     layout: {
@@ -51,7 +51,7 @@ Ext.define('eXe.view.ui.eXeViewport', {
                 },
                 {
                     xtype: 'uxNotification',
-                    region: 'center',
+                    region: 'south',
                     itemId: 'notificationsArea',
                     title: 'Publishing document to Google Drive',
                     closeAction: 'hide',

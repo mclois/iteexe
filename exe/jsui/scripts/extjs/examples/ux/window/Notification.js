@@ -11,7 +11,7 @@
  *
  */
 
-Ext.define('Ext.ux.Notification', {
+Ext.define('Ext.ux.window.Notification', {
 	extend: 'Ext.window.Window',
 	alias: 'widget.uxNotification',
 
