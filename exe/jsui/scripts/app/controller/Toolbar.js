@@ -629,16 +629,12 @@ Ext.define('eXe.controller.Toolbar', {
                   this.processExportGoogleDrive);
         }
         else {
-            // Use notification window
-            notif = Ext.ComponentQuery.query("#notificationsArea")[0];
-            notif.update('Starting publication of this document in your Google Drive account. ');
-            notif.show();
+            eXe.controller.eXeViewport.prototype.gDriveNotificationStatus('Starting publication of this document in Google Drive');
 
             // Access token has been successfully retrieved, requests can be sent to the API
             nevow_clientToServerEvent('exportGoogleDrive', this, '', authResult.access_token, navigator.userAgent);
-
-            notif.update('Publication of this document in your Google Drive account started. ');
-            notif.show();
+            
+            eXe.controller.eXeViewport.prototype.gDriveNotificationStatus('Publication of this document in your Google Drive account started. ');
         }
     },
     

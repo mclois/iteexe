@@ -52,10 +52,10 @@ Ext.define('eXe.view.ui.eXeViewport', {
                 {
                     xtype: 'uxNotification',
                     region: 'south',
-                    itemId: 'notificationsArea',
+                    itemId: 'gDriveNotification',
                     title: 'Publishing document to Google Drive',
                     closeAction: 'hide',
-                    position: 'br',
+                    position: 'b',
                     useXAxis: false,
                     cls: 'ux-notification-light',
                     iconCls: 'ux-notification-icon-information'
@@ -66,5 +66,5 @@ Ext.define('eXe.view.ui.eXeViewport', {
         });
 
         me.callParent(arguments);
-    }
+    },
 });
