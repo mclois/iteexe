@@ -80,24 +80,33 @@ class WebsiteExport(object):
         'webSite' to a temporary directory and uploads the exported files to
         Google Drive
         """
-        def insertFile(public_folder, drive, upload_file):
+        num_total = 0;
+        file_num = 0;
+        
+        def finishExport(public_folder, outputDir):
+            link_url = 'http://googledrive.com/host/%s'%(public_folder['id'])
+            link_text = public_folder['title']
+            self.gDriveNotificationStatus(client, _(u'Package exported to <a href="%s" target="_blank" title="Click to visit exported site">%s</<a>') %(link_url,link_text))
+            return public_folder
+        
+        def insertFile(public_folder, drive, upload_file, file_num):
             """
             Creates the deferred that will upload files to the public folder
             once it is created
             """
-            upload_content_d = threads.deferToThread(uploadContent, public_folder, drive, upload_file)
+            upload_content_d = threads.deferToThread(uploadContent, public_folder, drive, upload_file, file_num)
             upload_content_d.addCallbacks(uploadContent_onSuccess, uploadContent_onFail)
             
             return upload_content_d
         
-        def uploadContent(public_folder, drive, upload_file):
+        def uploadContent(public_folder, drive, upload_file, file_num):
             """
             Uploads one file to the given GDrive folder
-            """
+            """ 
             filepath = os.path.join(self.filename, upload_file)
             filetype = mimetypes.guess_type(filepath, False)
             if filetype[0] is not None :
-                self.gDriveNotificationStatus(client, _(u'Uploading <em>%s</em> to public folder <em>%s</em>') %(upload_file, public_folder['title']))
+                self.gDriveNotificationStatus(client, _(u'Uploading <em>%s</em> to public folder <em>%s</em> (%d/%d)') %(upload_file, public_folder['title'], file_num, num_total))
                 mimetype = filetype[0]
                 meta = {
                   'title': upload_file,
@@ -107,7 +116,7 @@ class WebsiteExport(object):
                 media_body = MediaFileUpload(filepath, mimetype, resumable=True)
                 inserted_file = drive.files().insert(body=meta, media_body=media_body).execute()
             else :
-                self.gDriveNotificationStatus(client, _(u'Skipping file <em>%s</em>') %(upload_file))
+                self.gDriveNotificationStatus(client, _(u'Skipping file <em>%s</em> (%d/%d)') %(upload_file, file_num, num_total))
             
             return public_folder
             
@@ -172,7 +181,11 @@ class WebsiteExport(object):
             # successfully called its own callback 
             # (Deferred chain, see: http://krondo.com/?p=2159#attachment_2196)
             for upload_file in os.listdir(outputDir):
-                publicFolder_d.addCallback(insertFile, drive_service, upload_file)
+                file_num = file_num + 1
+                publicFolder_d.addCallback(insertFile, drive_service, upload_file, file_num)
+                
+            num_total = file_num
+            publicFolder_d.addCallback(finishExport, outputDir)
             
             # TODO clean exportDir after uploading has finished
             
