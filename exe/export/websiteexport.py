@@ -30,20 +30,21 @@ from exe.export.pages         import uniquifyNames
 from exe.export.websitepage   import WebsitePage
 from zipfile                  import ZipFile, ZIP_DEFLATED
 from exe.webui                import common
+from exe.webui.livepage       import allSessionClients
 from exe                      import globals as G
 import os
 import mimetypes
-from tempfile                    import mkdtemp
-from exe.engine.persist import encodeObject
-from exe.engine.persistxml import encodeObjectToXML
+from tempfile                 import mkdtemp
+from exe.engine.persist       import encodeObject
+from exe.engine.persistxml    import encodeObjectToXML
 
-from twisted.internet            import threads
+from twisted.internet         import threads
 
 import httplib2
-from oauth2client.client     import AccessTokenCredentials
-from apiclient import errors
-from apiclient.discovery import build
-from apiclient.http import MediaFileUpload
+from oauth2client.client      import AccessTokenCredentials
+from apiclient                import errors
+from apiclient.discovery      import build
+from apiclient.http           import MediaFileUpload
 
 log = logging.getLogger(__name__)
 
@@ -70,6 +71,9 @@ class WebsiteExport(object):
         self.report          = report
         self.styleSecureMode = config.styleSecureMode
         
+    def gDriveNotificationStatus(self, client, mesg):
+        client.sendScript("eXe.controller.eXeViewport.prototype.gDriveNotificationStatus('%s');" % (mesg), filter_func=allSessionClients)
+        
     def exportGoogleDrive(self, package, client, auth_token, user_agent):
         """
         Creates an authorized HTTP conexion, exports the current package as
@@ -93,6 +97,7 @@ class WebsiteExport(object):
             filepath = os.path.join(self.filename, upload_file)
             filetype = mimetypes.guess_type(filepath, False)
             if filetype[0] is not None :
+                self.gDriveNotificationStatus(client, _(u'Uploading <em>%s</em> to public folder <em>%s</em>') %(upload_file, public_folder['title']))
                 mimetype = filetype[0]
                 meta = {
                   'title': upload_file,
@@ -101,15 +106,17 @@ class WebsiteExport(object):
                 }
                 media_body = MediaFileUpload(filepath, mimetype, resumable=True)
                 inserted_file = drive.files().insert(body=meta, media_body=media_body).execute()
+            else :
+                self.gDriveNotificationStatus(client, _(u'Skipping file <em>%s</em>') %(upload_file))
             
             return public_folder
             
         def uploadContent_onFail(err):
-            client.alert(_(u'Failed exporting to GoogleDrive: %s') % str(err))
+            self.gDriveNotificationStatus(client, _(u'Failed exporting to GoogleDrive: %s') % str(err))
             return err
             
         def uploadContent_onSuccess(public_folder):
-            #client.alert(_(u'Exported to GoogleDrive: %s') % public_folder['title'])
+#            self.gDriveNotificationStatus(client, _(u'Exported to GoogleDrive: %s') % public_folder['title'])
             return public_folder
                 
         def publicFolder(drive, folder_name):
@@ -119,6 +126,7 @@ class WebsiteExport(object):
             """
             
             # Create public folder
+            self.gDriveNotificationStatus(client, _(u'Creating public folder to host published web site'))
             body = {
                 'title': folder_name,
                 'mimeType': 'application/vnd.google-apps.folder'
@@ -135,19 +143,21 @@ class WebsiteExport(object):
             return public_folder
             
         def publicFolder_onFail(err):
-            client.alert(_(u'Failed exporting to GoogleDrive: %s') % str(err))
+            self.gDriveNotificationStatus(client, _(u'Failed exporting to GoogleDrive: %s') % str(err))
             return err
             
         def publicFolder_onSuccess(public_folder):
-            client.alert(_(u'Exported to GoogleDrive: %s') % (public_folder['title']))
+            self.gDriveNotificationStatus(client, _(u'Created public folder to host published web site: %s') % (public_folder['title']))
             return public_folder
             
         try:
             # Creates a new temporary dir to export the package to, it will be deleted
             # once the export process is finished
             self.filename = Path(mkdtemp())
+            self.gDriveNotificationStatus(client, _(u'Exporting package as web site in: %s') % (self.filename))
             outputDir = self.export(package)
             
+            self.gDriveNotificationStatus(client, _(u'Starting authorized connection to Google Drive API'))
             credentials = AccessTokenCredentials(auth_token, user_agent)
             http = httplib2.Http()
             http = credentials.authorize(http)
@@ -167,7 +177,7 @@ class WebsiteExport(object):
             # TODO clean exportDir after uploading has finished
             
         except Exception, e:
-            client.alert(_('EXPORT FAILED!\n%s') % str(e))
+            self.gDriveNotificationStatus(client, _('EXPORT FAILED!\n%s') % str(e))
             raise
         #client.alert(_(u'Exported to %s') % filename)
 

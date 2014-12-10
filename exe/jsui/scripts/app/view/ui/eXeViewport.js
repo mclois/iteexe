@@ -55,6 +55,7 @@ Ext.define('eXe.view.ui.eXeViewport', {
                     itemId: 'gDriveNotification',
                     title: 'Publishing document to Google Drive',
                     closeAction: 'hide',
+                    autoClose: false,
                     position: 'b',
                     useXAxis: false,
                     cls: 'ux-notification-light',
