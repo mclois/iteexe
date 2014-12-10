@@ -25,6 +25,7 @@ WebsiteExport will export a package as a website of HTML pages
 import logging
 import re
 import imp
+from shutil                   import rmtree
 from exe.engine.path          import Path, TempDirPath
 from exe.export.pages         import uniquifyNames
 from exe.export.websitepage   import WebsitePage
@@ -84,6 +85,9 @@ class WebsiteExport(object):
         file_num = 0;
         
         def finishExport(public_folder, outputDir):
+            self.gDriveNotificationStatus(client, _(u'Deleting temporary directory'))
+            rmtree(outputDir)
+            
             link_url = 'http://googledrive.com/host/%s'%(public_folder['id'])
             link_text = public_folder['title']
             self.gDriveNotificationStatus(client, _(u'Package exported to <a href="%s" target="_blank" title="Click to visit exported site">%s</<a>') %(link_url,link_text))
