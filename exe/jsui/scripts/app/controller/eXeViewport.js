@@ -24,5 +24,36 @@ Ext.define('eXe.controller.eXeViewport', {
         notif = Ext.ComponentQuery.query("#gDriveNotification")[0];
         notif.update(message);
         notif.show();
+    },
+
+    gDriveNotificationNotice : function(message, errLevel) {
+        switch (errLevel) {
+        case 'info' :
+        case 'notice' :
+            windowTitle = 'Google Drive';
+            windowClass = 'ux-notification-icon-information';
+            break;
+
+        case 'warning' :
+        case 'error' :
+            windowTitle = 'Google Drive error';
+            windowClass = 'ux-notification-icon-error';
+            break;
+
+        default :
+            windowTitle = 'Google Drive';
+            windowClass = 'ux-notification-icon-error';
+            break;
+        }
+        
+        Ext.create('widget.uxNotification', {
+            title: windowTitle,
+            position: 'br',
+            cls: 'ux-notification-light',
+            iconCls: windowClass,
+            autoClose: false,
+            spacing: 20,
+            html: message
+        }).show();
     }
 });

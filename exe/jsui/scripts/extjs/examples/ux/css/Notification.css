@@ -26,3 +26,10 @@ body .ux-notification-light {
   background-color: transparent;
   border: 0px solid white;
 }
+
+.ux-notification-light .x-window-body em {
+  text-style: italic;
+}
+.ux-notification-light .x-window-body strong {
+  text-style: bold;
+}

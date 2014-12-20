@@ -18,6 +18,7 @@
 //===========================================================================
 
 Ext.define('eXe.view.ui.eXeViewport', {
+    id: 'exe-viewport',
     extend: 'Ext.container.Viewport',
     requires: [
         'eXe.view.ui.eXeToolbar',

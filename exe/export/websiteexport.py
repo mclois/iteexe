@@ -75,6 +75,9 @@ class WebsiteExport(object):
     def gDriveNotificationStatus(self, client, mesg):
         client.sendScript("eXe.controller.eXeViewport.prototype.gDriveNotificationStatus('%s');" % (mesg), filter_func=allSessionClients)
         
+    def gDriveNotificationNotice(self, client, mesg):
+        client.sendScript("eXe.controller.eXeViewport.prototype.gDriveNotificationNotice('%s');" % (mesg), filter_func=allSessionClients)
+        
     def exportGoogleDrive(self, package, client, auth_token, user_agent):
         """
         Creates an authorized HTTP conexion, exports the current package as
@@ -118,14 +121,14 @@ class WebsiteExport(object):
                   'parents' : [{'id' : public_folder['id']}]
                 }
                 media_body = MediaFileUpload(filepath, mimetype, resumable=True)
-                inserted_file = drive.files().insert(body=meta, media_body=media_body).execute()
+                drive.files().insert(body=meta, media_body=media_body).execute()
             else :
-                self.gDriveNotificationStatus(client, _(u'Skipping file <em>%s</em> (%d/%d)') %(upload_file, file_num, num_total))
+                self.gDriveNotificationNotice(client, _(u'File <em>%s</em> skipped, unknown filetype (%d/%d)') %(upload_file, file_num, num_total))
             
             return public_folder
             
         def uploadContent_onFail(err):
-            self.gDriveNotificationStatus(client, _(u'Failed exporting to GoogleDrive: %s') % str(err))
+            self.gDriveNotificationNotice(client, _(u'Failed exporting to GoogleDrive: %s') % str(err), 'error')
             return err
             
         def uploadContent_onSuccess(public_folder):
@@ -156,7 +159,7 @@ class WebsiteExport(object):
             return public_folder
             
         def publicFolder_onFail(err):
-            self.gDriveNotificationStatus(client, _(u'Failed exporting to GoogleDrive: %s') % str(err))
+            self.gDriveNotificationNotice(client, _(u'Failed exporting to GoogleDrive: %s') % str(err), 'error')
             return err
             
         def publicFolder_onSuccess(public_folder):
@@ -194,7 +197,7 @@ class WebsiteExport(object):
             # TODO clean exportDir after uploading has finished
             
         except Exception, e:
-            self.gDriveNotificationStatus(client, _('EXPORT FAILED!\n%s') % str(e))
+            self.gDriveNotificationNotice(client, _('EXPORT FAILED!\n%s') % str(e), 'error')
             raise
         #client.alert(_(u'Exported to %s') % filename)
 
