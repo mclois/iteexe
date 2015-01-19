@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
+#-*- coding: utf-8 -*-
 # ===========================================================================
 # eXe
 # Copyright 2004-2006, University of Auckland
@@ -2843,4 +2843,3 @@ class QuizQuestionElement(Element):
         html += "</"+sectionTag+">"+lb
 
         return html
-
