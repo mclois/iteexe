@@ -113,6 +113,13 @@ class WebsiteExport(object):
             try :
                 filepath = os.path.join(self.filename, upload_file)
                 filetype = mimetypes.guess_type(filepath, False)
+                
+                if filetype[0] is None :
+                    # Hard-coded types for special cases not detected by mimetypes.guess_type() 
+                    if upload_file == 'content.data' :
+                        filetype = ('application/octet-stream', None)
+                    
+                    
                 if filetype[0] is not None :
                     link_url = 'http://googledrive.com/host/%s'%(public_folder['id'])
                     link_text = public_folder['title']
