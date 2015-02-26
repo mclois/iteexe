@@ -110,6 +110,10 @@ class MainPage(RenderableLivePage):
 
     def child_authoring(self, ctx):
         """Returns the authoring page that corresponds to the url http://127.0.0.1:port/package_name/authoring"""
+        """
+        Returns the authoring page that corresponds to
+        the url http://127.0.0.1:port/package_name/authoring
+        """
         request = inevow.IRequest(ctx)
         if 'clientHandleId' in request.args:
             clientid = request.args['clientHandleId'][0]
@@ -187,10 +191,8 @@ class MainPage(RenderableLivePage):
         setUpHandler(self.handleMergeXliffPackage,   'mergeXliffPackage')
         setUpHandler(self.handleInsertPackage,   'insertPackage')
         setUpHandler(self.handleExtractPackage,  'extractPackage')
-        setUpHandler(self.outlinePane.handleSetTreeSelection,  
-                                                 'setTreeSelection')
-        setUpHandler(self.handleClearAndMakeTempPrintDir,
-                                                 'makeTempPrintDir')
+        setUpHandler(self.outlinePane.handleSetTreeSelection, 'setTreeSelection')
+        setUpHandler(self.handleClearAndMakeTempPrintDir, 'makeTempPrintDir')
         setUpHandler(self.handleRemoveTempDir,   'removeTempDir')
         setUpHandler(self.handleTinyMCEimageChoice,   'previewTinyMCEimage')
         setUpHandler(self.handleTinyMCEmath,     'generateTinyMCEmath')
@@ -412,7 +414,7 @@ class MainPage(RenderableLivePage):
                 os.rmdir(os.path.join(root, name))
         ##################################################################
         # and finally, go ahead and remove the top-level tempdir itself:
-        if (int(rm_top_dir) != 0):
+        if int(rm_top_dir) != 0:
             os.rmdir(tempdir)
       
         
@@ -454,7 +456,7 @@ class MainPage(RenderableLivePage):
         # if not, create it:
         if cmp(under_dirname,"") != 0:
             if os.path.exists(under_dirname):
-                if (os.path.isdir(under_dirname)):
+                if os.path.isdir(under_dirname):
                     # Yes, this directory already exists.  
                     # pre-clean it, keeping the clutter down:
                     clear_tempdir = 1
@@ -572,7 +574,7 @@ class MainPage(RenderableLivePage):
 
             localImagePath = Path(local_filename)
             log.debug('handleTinyMCEimageChoice: after Path, localImagePath= '
-                    + localImagePath);
+                    + localImagePath)
             if not localImagePath.exists() or not localImagePath.isfile():
                 client.alert( \
                      _(u'Local file %s is not found, cannot preview it') \
@@ -587,14 +589,14 @@ class MainPage(RenderableLivePage):
             # joinpath needs its join arguments to already be in Unicode:
             #preview_filename = toUnicode(preview_filename);
             # but that's okay, cuz preview_filename is now URI safe, right?
-            log.debug('URIencoded preview filename=' + preview_filename);
+            log.debug('URIencoded preview filename=' + preview_filename)
 
-            server_filename = previewDir.joinpath(preview_filename);
+            server_filename = previewDir.joinpath(preview_filename)
             log.debug("handleTinyMCEimageChoice copying image from \'"\
                     + local_filename + "\' to \'" \
-                    + server_filename.abspath() + "\'.");
+                    + server_filename.abspath() + "\'.")
             shutil.copyfile(local_filename, \
-                    server_filename.abspath());
+                    server_filename.abspath())
 
             # new optional description file to provide the 
             # actual base filename, such that once it is later processed
@@ -615,7 +617,7 @@ class MainPage(RenderableLivePage):
             descrip_file_path = Path(server_filename+".exe_info")
             log.debug("handleTinyMCEimageChoice creating preview " \
                     + "description file \'" \
-                    + descrip_file_path.abspath() + "\'.");
+                    + descrip_file_path.abspath() + "\'.")
             descrip_file = open(descrip_file_path, 'wb')
 
             # safety measures against TinyMCE, otherwise it will 
@@ -625,7 +627,7 @@ class MainPage(RenderableLivePage):
             unhashed_filename  = unspaced_filename.replace('#', '_num_')
             unamped_local_filename  = unhashed_filename.replace('&', '_and_')
             log.debug("and setting new file basename as: " 
-                    + unamped_local_filename);
+                    + unamped_local_filename)
             my_basename = os.path.basename(unamped_local_filename)
             
             descrip_file.write((u"basename="+my_basename).encode('utf-8'))
@@ -682,7 +684,7 @@ class MainPage(RenderableLivePage):
         #        errors += 1
 
         # the mimetex usage code was swiped from the Math iDevice:
-        if latex_source <> "":
+        if latex_source != "":
 
             # first write the latex_source out into the preview_math_srcfile,
             # such that it can then be passed into the compile command:
@@ -709,12 +711,12 @@ class MainPage(RenderableLivePage):
                 raise
 
             # copy the file into previews
-            server_filename = previewDir.joinpath(preview_image_filename);
+            server_filename = previewDir.joinpath(preview_image_filename)
             log.debug("handleTinyMCEmath copying math image from \'"\
                     + tempFileName + "\' to \'" \
-                    + server_filename.abspath().encode('utf-8') + "\'.");
+                    + server_filename.abspath().encode('utf-8') + "\'.")
             shutil.copyfile(tempFileName, \
-                    server_filename.abspath().encode('utf-8'));
+                    server_filename.abspath().encode('utf-8'))
 
             # Delete the temp file made by compile 
             Path(tempFileName).remove()
@@ -859,7 +861,7 @@ class MainPage(RenderableLivePage):
         if url.find('%t') > -1:
             release_notes = os.path.join(G.application.tempWebDir,
                     'Release_Notes.html')
-            f = open(release_notes, 'wt')
+            f = open(release_notes, 'w')
             f.write('''<html>
                 <head>
                   <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
