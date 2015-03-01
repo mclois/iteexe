@@ -46,7 +46,14 @@ except:
                 pkg_version = open('../Resources/exe/version').readline()
                 release = pkg_version[0:-42]
 
-revision = pkg_version[-40:] if pkg_version else ''
+try:
+    import git
+
+    repo = git.Repo()
+    revision = repo.head.commit.hexsha
+except:
+    revision = pkg_version[-40:] if pkg_version else ''
+
 version = release + "-r" + revision if revision else release
 
 if __name__ == '__main__':
