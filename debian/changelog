@@ -1,3 +1,9 @@
+intef-exe (3:2.0.2ppa01) UNRELEASED; urgency=low
+
+  * Adapt version number to Ubuntu PPA guidelines
+
+ -- Mercedes Cotelo Lois <mclois@gmail.com>  Sun, 01 Mar 2015 09:53:20 +0100
+
 intef-exe (3:2.0.2) lucid; urgency=low
 
   [ José Miguel Andonegi ]
