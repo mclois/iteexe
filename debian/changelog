@@ -1,8 +1,16 @@
-intef-exe (3:2.0.2ppa01) UNRELEASED; urgency=low
+intef-exe (3:2.0.3) lucid; urgency=low
 
-  * Adapt version number to Ubuntu PPA guidelines
+  [ Mercedes Cotelo ]
+    Fix bug [#2413]: Actualización Firefox 36.0 en Debian Ubuntu Problemas
 
- -- Mercedes Cotelo Lois <mclois@gmail.com>  Sun, 01 Mar 2015 09:53:20 +0100
+  [ Juan Rafael Fernández ]
+  * Trying to solve the menu+xpm / freedesktop+png confusion
+  * Another fix for bug [#2258] No call to update-mime-database
+
+  [ Pedro Peña ]
+  * Fix bug [#2303]: Wrong file format problem
+
+ -- Pedro Peña Pérez <pedro.pena@open-phoenix.com>  Wed, 04 Mar 2015 15:24:22 +0100
 
 intef-exe (3:2.0.2) lucid; urgency=low
 
