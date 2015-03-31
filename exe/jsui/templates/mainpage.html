@@ -19,14 +19,7 @@
     <script type="text/javascript" src="../jsui/langs.js"></script>
     <script type="text/javascript" src="../jsui/lomvocab.js"></script>
     <script type="text/javascript" src="https://apis.google.com/js/client.js"></script>
-    <script type="text/javascript">
-      var GOOGLE_API_CLIENT_ID = '441234978726-0r3qr3kgasor1elkl4dj8mjtp22gp74i.apps.googleusercontent.com';
-      var GOOGLE_API_SCOPES = [
-          'https://www.googleapis.com/auth/drive.file',
-          // Add other scopes needed by your application.
-        ];
-      var GOOGLE_API_REDIRECT_URI = 'http://localhost:51235/gdrive-callback'
-    </script>
+    <script nevow:render="googleapiinit" type="text/javascript"></script>
 </head>
 <body>
 	<div id="loading-mask"></div>

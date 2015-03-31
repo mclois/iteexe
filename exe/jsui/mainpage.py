@@ -253,6 +253,15 @@ class MainPage(RenderableLivePage):
                         ]
                ] 
 
+    def render_googleapiinit(self, ctx, data):
+        google_api_script = (
+          "var GOOGLE_API_CLIENT_ID = '%s'; " % (self.config.googleApiClientID)
+        + "var GOOGLE_API_SCOPES = [ "
+        + "  'https://www.googleapis.com/auth/drive.file', "
+        + "]; "
+        + "var GOOGLE_API_REDIRECT_URI = 'http://localhost:51235/gdrive-callback'; ")
+        return google_api_script
+
     def handleTestPrintMsg(self, client, message): 
         """ 
         Prints a test message, and yup, that's all! 
