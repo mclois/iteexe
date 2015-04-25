@@ -104,7 +104,8 @@ Ext.application({
     	'Idevice',
         'MainTab',
     	'Outline',
-    	'Toolbar',
+        'Toolbar',
+        'StyleManager',
     	'filepicker.Directory',
     	'filepicker.File'
     ],
