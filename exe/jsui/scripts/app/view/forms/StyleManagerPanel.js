@@ -1,7 +1,20 @@
 // ===========================================================================
-// eXe
-// JR: Panel del gestor de estilos
-// FM: Export with new config.xml
+// eXeLearning
+// Copyright 2014, Mercedes Cotelo Lois
+//
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation; either version 2 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //===========================================================================
 function prexml(title,value,mode) {
     var datt = '';
@@ -331,78 +344,184 @@ function createPanelProperties(properties, stylen,mode,withbutton) {
     return panel;
 }
 
-function createPanelStylesRepository(rep_styles) {
-    // rep_styles could be empty or not present
-    rep_styles = typeof rep_styles !== 'undefined' ? rep_styles : [];
+/**
+ * Create the panel that renders the info of a Style in the repository
+ * 
+ * @param style             Object with the style data as loaded from repository
+ * @param activeStyle       String, name of the expanded style
+ * 
+ * @returns Object, valid to be used in the items list of the accordion container 
+ */
+function createPanelRepositoryStyle(style, activeStyle) {
+    activeStyle = typeof activeStyle !== 'undefined' ? activeStyle : '';
     
-    var i;
-    var itemsStyleList = [];
-
-    var titleImportStyle=_("Download style from URL");
-    var titleStyleList =_("Download style from URL");
+    var i; 
+    var tagsHtml, coloursHtml;
+    var expandPanel = false;
     
-    var itemsImportStyle = [
-        { 
-            xtype: 'textfield',
-            itemId: 'style_import_url',
-            name: 'style_import_url',
-            fieldLabel: _('URL'),
-            tooltip: _('URL to download the style from.'),
-        },
-        {
-            xtype: 'button',
-            text: _('Import Style from URL'),
-            tooltip: _('Download style from URL and import into system.'),
-            itemId: 'style_import_from_url',
-            name: 'style_import_from_url',
-            icon: '/images/stock-import.png',
-            style:'float:left;',
-            margin: 10,
-        },
-    ];
-    
-    for (i = rep_styles.length-1; i >= 0; i--) {
-        //item = Ext.create('Ext.menu.CheckItem', { text: styles[i].label, itemId: styles[i].style, checked: styles[i].selected });
-        var style=[];
-        style[0] = 
-        { 
-            xtype: 'label',
-            width: 320,
-            margin: '5 5 5 20',
-            style:"font-size:105%",
-            text: rep_styles[i].title['und']
-        };
-        var estilo = "";
-        if (i%2 == 0) {
-            estilo = 'padding-top:5px; background-color: #FFF;';
-        } 
-        else {
-            estilo = 'padding-top:5px; background-color: #FAFAFA; border-top-color: #B5B8C8; border-bottom-color: #B5B8C8; border-top-style:solid; border-bottom-style: solid; border-top-width:1px; border-bottom-width: 1px;';
-        }
-        
-        var item =
-        { 
-            xtype: 'container',
-            layout: 'hbox',
-            margin: '0 0 5 0',
-            style: estilo,
-            items: style
-        };
-        itemsStyleList[i] = item;
+    if (activeStyle != '' && activeStyle.toLowerCase() == style.name.toLowerCase()) {
+        expandPanel = true;
     }
     
+    var stylePanel = { 
+        itemId: style.name,
+        name: style.name,
+        id: style.name,
+        title: style.title['und'],
+        xtype: 'panel',
+        cls: 'repository-style',
+        collapsed: !expandPanel,
+        layout: {
+            type: 'vbox',
+            align: 'stretch'
+        },
+        items: [
+            {html: style.description['und']}
+        ]
+    };
+    
+    if (style.author.trim() && style.author.length > 0) {
+        if (style.author_url.trim() && style.author_url.length > 0) {
+            authorLink = '<div class="repository-style-author">' + _('Author') + ': <a href="' + style.author_url + '" target="_blank">' + style.author + '</a></div>';
+            stylePanel.items.push({html: authorLink});
+        }
+        else {
+            author = '<div class="repository-style-author">' + _('Author') + ': ' + style.author + '</div>';
+            stylePanel.items.push({html: author});
+        }
+    }
+    
+    licenseLink = '<div class="repository-style-license">' + _('License') + ': <a href="' + style.license_url + '" target="_blank">' + style.license + '</a></div>';
+    stylePanel.items.push({html: licenseLink});
+    
+    if (style.tags.length >= 1) {
+        tagsHtml = '';
+        for (i = 0; i <= style.tags.length-1; i++) {
+            tagsHtml += '<li>' + style.tags[i].title['und'] + '</li>';
+        }
+        tagsHtml = '<ul>' + tagsHtml + '</ul>';
+        
+        stylePanel.items.push({html: tagsHtml});
+    }
+    
+    if (style.colours.length >= 1) {
+        coloursHtml = '';
+        for (i = 0; i <= style.colours.length-1; i++) {
+            coloursHtml += '<li>' + style.colours[i].title['und'] + '</li>';
+        }
+        coloursHtml = '<ul>' + coloursHtml + '</ul>';
+        
+        stylePanel.items.push({html: coloursHtml});
+    }
+
+    readMoreLink = '<div class="repository-style-read-more"><a href="' + style.link_url + '" target="_blank">' + _('Read more') + '</a></div>';
+    stylePanel.items.push({html: readMoreLink});
+    
+    importButton = {
+        xtype: 'button',
+        text: _('Import style'),
+        tooltip: _('Download style from repository and import into system.'),
+        itemId: 'repository_style_import_' + style.name,
+        name: 'repository_style_import_' + style.name,
+        button_class: 'repository_style_import',
+        value: style.name,
+        icon: '/images/stock-import.png',
+        style:'float:left',
+        margin: 3,
+    };
+    stylePanel.items.push(importButton);
+    
+    return stylePanel;
+}
+
+
+/**
+ * Create the panel that renders the form to import style from URL
+ * 
+ * @param activeStyle       String, name of the expanded style
+ * 
+ * @returns Object, valid to be used in the items list of the accordion container 
+ */
+function createImportStyleUrlPanel(activeStyle) {
+    activeStyle = typeof activeStyle !== 'undefined' ? activeStyle : '';
+    
+    // Expand last panel, unless some style has been selected as active
+    var expandPanel = true;
+    if (activeStyle != '') {
+        expandPanel = false;
+    }
+    
+    var panel = {
+        title: _("Import style from custom URL"),
+        itemId: 'style_import_url_container',
+        collapsed: !expandPanel,
+        xtype: 'panel',
+        height: 60,
+        layout: {
+            type: 'hbox',
+            align: 'stretch'
+        },
+        cls: 'import-style-url',
+        items: [
+            { 
+                xtype: 'textfield',
+                itemId: 'style_import_url',
+                name: 'style_import_url',
+                fieldLabel: _('URL'),
+                tooltip: _('URL to download the style from.'),
+                margin: 3,
+            },
+            {
+                xtype: 'button',
+                text: _('Import Style from URL'),
+                tooltip: _('Download style from URL and import into system.'),
+                itemId: 'style_import_from_url',
+                name: 'style_import_from_url',
+                icon: '/images/stock-import.png',
+                style:'float:left;',
+                margin: 3,
+            }
+        ]
+    };
+        
+    return panel;
+}
+
+/**
+ * Renders accordion panels that displays the styles repository list, one panel per style
+ *  
+ * @param repositoryStyles  Array, list of repository styles
+ * @param activeStyle       String, name of the expanded style
+ * 
+ * @returns  Array of objects with the structure of the accordion panels to display the styles repository list
+ */
+function createPanelRepositoryStyles(repositoryStyles, activeStyle) {
+    // repositoryStyles could be empty or not present
+    repositoryStyles = typeof repositoryStyles !== 'undefined' ? repositoryStyles : [];
+    activeStyle = typeof activeStyle !== 'undefined' ? activeStyle : '';
+    
+    var i;
+
+    var titleStylesList =_("Check and install styles in the repository");
+    var itemsStylesList = [];
+    
+    // Build the list of items in the accordion, one panel per style
+    for (i = repositoryStyles.length-1; i >= 0; i--) {
+        itemsStylesList[i] = createPanelRepositoryStyle(repositoryStyles[i], activeStyle);
+    }
+    
+    // Add fieldset to import from custom URL as the last panel in the accordion
+    var importStyle = createImportStyleUrlPanel();
+    itemsStylesList.push(importStyle);
+
     panel = [
         {
-            xtype: 'fieldset',
-            title: titleImportStyle,
-            margin: 10,
-            items: itemsImportStyle,
-        },
-        {
-            xtype: 'fieldset',
-            title: titleStyleList,
-            margin: 10,
-            items: itemsStyleList,
+            xtype: 'container',
+            layout: 'accordion',
+            name: 'rep_styles_list',
+            cls: 'repository-styles-list',
+            title: titleStylesList,
+            items: itemsStylesList
         },
         {
             xtype: 'button',
@@ -411,9 +530,18 @@ function createPanelStylesRepository(rep_styles) {
             icon: '/images/stock-go-back.png',
             itemId: 'return_styles_list',
             name: 'return_styles_list',
-            margin: 10,
-        },
+            margin: 10
+        }
     ];
+    
+    var styleName =
+    { 
+        xtype: 'field',
+        hidden: true,
+        itemId: 'style_name',
+        name: 'style_name'
+    };
+    panel.push(styleName);
     
     return panel;
 }
@@ -429,6 +557,7 @@ function createPanel() {
         async: false,
         success: function(response) {
             var json = Ext.JSON.decode(response.responseText);
+            
             if (json.action == 'List') {
                 panel = createPanelStyles(json.styles);
             }
@@ -443,7 +572,7 @@ function createPanel() {
                 panel = createPanelProperties(json.properties, json.style,true,true);
             }
             else if (json.action == 'StylesRepository') {
-                panel = createPanelStylesRepository(json.rep_styles);
+                panel = createPanelRepositoryStyles(json.rep_styles, json.active_style);
             }
             else {
                 panel = createPanelStyles(json.styles);
@@ -484,7 +613,7 @@ Ext.define('eXe.view.forms.StyleManagerPanel', {
             items: panel        
         });
         me.callParent(arguments);
-        me.doLayout();        
+        me.doLayout();
     },
     
     reload: function(action) {
@@ -498,14 +627,23 @@ Ext.define('eXe.view.forms.StyleManagerPanel', {
         me.doLayout();
     },
     
-    refreshStylesList: function(rep_styles) {    
+    refreshStylesList: function(repStyles, activeStyle) {    
         var me = Ext.getCmp("stylemanagerwin").down("form");
         var stylemanager = Ext.getCmp("stylemanagerwin");
         var formpanel = stylemanager.down('form');
-        var panel = createPanelStylesRepository(rep_styles);
+        var panel = createPanelRepositoryStyles(repStyles, activeStyle);
+        var action =
+        { 
+            xtype: 'field',
+            hidden: true,
+            itemId: 'action',
+            name: 'action',
+            value: '',
+        };
+        panel.push(action);
         
         formpanel.removeAll(false);
         formpanel.add(panel);
-        me.doLayout();        
-    },
+        me.doLayout(); 
+    }
 });

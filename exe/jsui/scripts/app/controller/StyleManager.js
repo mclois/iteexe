@@ -1,5 +1,21 @@
 // ===========================================================================
-// eXe
+// eXeLearning
+// Copyright 2014, Mercedes Cotelo Lois
+//
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation; either version 2 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+//===========================================================================
 Ext.define('eXe.controller.StyleManager', {
     extend: 'Ext.app.Controller',
     
@@ -47,6 +63,12 @@ Ext.define('eXe.controller.StyleManager', {
             'button[button_class=delete_style]': {
                 click:  function(element, record, item, index, e, eOpts) {
                     this.triggerDeleteStyle(element);
+                }
+            },
+            // There is an 'Import style' button for each style in the repository styles list
+            'button[button_class=repository_style_import]' : {
+                click: function(element, record, item, index, e, eOpts) {
+                    this.triggerImportRepositoryStyle(element);
                 }
             },
         });
@@ -220,6 +242,31 @@ Ext.define('eXe.controller.StyleManager', {
                         }
                     });
                 }
+            }
+        });
+    },
+
+    /**
+     * Set 'action' and 'style' fields values and submit form
+     * 
+     * @param button  Clicked button, its value is the name of the repository style to be imported
+     */
+    triggerImportRepositoryStyle: function(button) {
+        // Set 'action' field value to 'doStyleImportRepository',
+        // 'style_name' to the clicked style and submit form to server
+        var formpanel = button.up('form');
+        var form = formpanel.getForm();
+        var action = form.findField('action');
+        var style_name = form.findField('style_name');
+        
+        action.setValue('doStyleImportRepository');
+        style_name.setValue(button.value);
+        form.submit({
+            success: function() {
+                //formpanel.reload();
+            },
+            failure: function(form, action) {
+                Ext.Msg.alert(_('Error'), action.result.errorMessage);
             }
         });
     },
