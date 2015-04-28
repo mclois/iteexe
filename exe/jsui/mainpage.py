@@ -260,7 +260,7 @@ class MainPage(RenderableLivePage):
         + "  'https://www.googleapis.com/auth/drive.file', "
         + "]; "
         + "var GOOGLE_API_REDIRECT_URI = 'http://localhost:51235/gdrive-callback'; ")
-        return google_api_script
+        return ctx.tag()[google_api_script]
 
     def handleTestPrintMsg(self, client, message):
         """
