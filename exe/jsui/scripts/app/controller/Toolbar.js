@@ -150,14 +150,18 @@ Ext.define('eXe.controller.Toolbar', {
             '#tools_refresh': {
                 click: this.toolsRefresh
             },
+            // Task 1080. jrf
+            // '#help_tutorial': {
+            //    click: this.fileOpenTutorial
+            // },
+            // '#help_manual': {
+            //    click: { fn: this.processBrowseEvent, url: 'file://%s/docs/manual/Online_manual.html' }
+            // },
             '#help_tutorial': {
-                click: this.fileOpenTutorial
-            },
-            '#help_manual': {
-                click: { fn: this.processBrowseEvent, url: 'file://%s/docs/manual/Online_manual.html' }
+                click: { fn: this.processBrowseEvent, url: 'http://exelearning.net/html_manual/exe20_en/' }
             },
             '#help_notes': {
-                click: { fn: this.processBrowseEvent, url: 'file://%t' }
+                click: { fn: this.releaseNotesPage }
             },
             '#help_website': {
                 click: { fn: this.processBrowseEvent, url: 'http://exelearning.net/' }
@@ -307,7 +311,23 @@ Ext.define('eXe.controller.Toolbar', {
         });
         about.show();
 	},
-    
+
+    releaseNotesPage: function() {
+        var about = new Ext.Window ({
+          height: eXe.app.getMaxHeight(700),
+          width: 900,
+          modal: true,
+          resizable: false,
+          id: 'releasenoteswin',
+          title: _("Release notes"),
+          items: {
+              xtype: 'uxiframe',
+              src: '/release-notes',
+              height: '100%'
+          }
+        });
+        about.show();
+    },
     browseURL: function(url) {
         nevow_clientToServerEvent('browseURL', this, '', url);
     },
@@ -315,14 +335,15 @@ Ext.define('eXe.controller.Toolbar', {
     processBrowseEvent: function(menu, item, e, eOpts) {
         this.browseURL(e.url)
     },
+
+    // Not used - Task 1080, jrf
+    // fileOpenTutorial: function() {
+    //    this.askDirty("eXe.app.getController('Toolbar').fileOpenTutorial2()");
+    // },
     
-    fileOpenTutorial: function() {
-        this.askDirty("eXe.app.getController('Toolbar').fileOpenTutorial2()");
-    },
-    
-    fileOpenTutorial2: function() {
-        nevow_clientToServerEvent('loadTutorial', this, '');
-    },
+    // fileOpenTutorial2: function() {
+    //     nevow_clientToServerEvent('loadTutorial', this, '');
+    // },
     
     toolsRefresh: function() {
         eXe.app.reload();
@@ -379,7 +400,7 @@ Ext.define('eXe.controller.Toolbar', {
         editor.show();        
 	},
 	
-	// JR: Launch the Style Manager Window
+	// JRJ: Launch the Style Manager Window
 	toolsStyleManager: function() {
         var stylemanager = new Ext.Window ({
           maxHeight: eXe.app.getMaxHeight(800), 
@@ -867,7 +888,7 @@ Ext.define('eXe.controller.Toolbar', {
     		success: function(response) {
 				var styles = Ext.JSON.decode(response.responseText),
 					menu = this.getStylesMenu(), i, item;
-					//JR: Primero los borro
+					// JRJ: Primero los borro
 					menu.removeAll();
     			for (i = styles.length-1; i >= 0; i--) {
                     item = Ext.create('Ext.menu.CheckItem', { text: styles[i].label, itemId: styles[i].style, checked: styles[i].selected });
@@ -900,8 +921,8 @@ Ext.define('eXe.controller.Toolbar', {
 		}
 		item.setChecked(true);
 		item.parentMenu.hide();
-		//provisional
-		//item.parentMenu.parentMenu.hide();
+		// provisional
+		// item.parentMenu.parentMenu.hide();
 		item.parentMenu.hide();
 		//
         var authoring = Ext.ComponentQuery.query('#authoring')[0].getWin();
