@@ -169,6 +169,9 @@ Ext.define('eXe.controller.Toolbar', {
             '#help_forums': {
                 click: { fn: this.processBrowseEvent, url: 'http://exelearning.net/forums/' }
             },
+            '#help_last': {
+                click: { fn: this.processBrowseEvent, url: 'http://exelearning.net/dowloads/' }
+            },
             '#help_about': {
                 click: this.aboutPage
             }

@@ -452,6 +452,13 @@ Ext.define('eXe.view.ui.eXeToolbar', {
                             {
                                 xtype: 'menuseparator'
                             },
+			    // New link menu to exelearning downloads web
+                            {
+                                xtype: 'accesskey_menuitem',
+                                itemId: 'help_last',
+                                accesskey: 'l',
+                                text: _('Last Release')
+                            },
                             {
                                 xtype: 'accesskey_menuitem',
                                 itemId: 'help_about',
