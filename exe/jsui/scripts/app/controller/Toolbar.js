@@ -170,7 +170,7 @@ Ext.define('eXe.controller.Toolbar', {
                 click: { fn: this.processBrowseEvent, url: 'http://exelearning.net/forums/' }
             },
             '#help_last': {
-                click: { fn: this.processBrowseEvent, url: 'http://exelearning.net/dowloads/' }
+                click: { fn: this.processBrowseEvent, url: 'http://exelearning.net/downloads/' }
             },
             '#help_about': {
                 click: this.aboutPage
