@@ -337,7 +337,7 @@ Ext.define('eXe.controller.Toolbar', {
     legalPage: function() {
         var legalnotes = new Ext.Window ({
           height: eXe.app.getMaxHeight(700),
-          width: 800,
+          width: 420,
           modal: true,
           resizable: false,
           id: 'legal',
