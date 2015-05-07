@@ -154,15 +154,20 @@ class AuthoringPage(RenderableResource):
         html += common.hiddenField(u'clientHandleId', request.args['clientHandleId'][0])
         html += u'<!-- start authoring page -->\n'
         html += u'<div id="nodeDecoration">\n'
+        html += u'<div id="headerContent">\n'
         html += u'<h1 id="nodeTitle">\n'
         html += escape(topNode.titleLong)
         html += u'</h1>\n'
+        html += u'</div>\n'
         html += u'</div>\n'
 
         for block in self.blocks:
             html += block.render(self.package.style)
 
         html += u'</div>'
+        style = G.application.config.styleStore.getStyle(self.package.style)
+        if style.hasValidConfig:
+            html += style.get_edition_extra_body()
         html += '<script type="text/javascript">$exeAuthoring.ready()</script>\n'
         html += common.footer()
 
@@ -216,6 +221,9 @@ class AuthoringPage(RenderableResource):
         html += u'<title>"+_("eXe : elearning XHTML editor")+"</title>\n'
         html += u'<meta http-equiv="content-type" content="text/html; '
         html += u' charset=UTF-8" />\n'
+        style = G.application.config.styleStore.getStyle(self.package.style)
+        if style.hasValidConfig:
+            html += style.get_edition_extra_head()        
         html += u'</head>\n'
         return html
 
