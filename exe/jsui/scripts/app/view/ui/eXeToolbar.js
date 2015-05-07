@@ -360,6 +360,31 @@ Ext.define('eXe.view.ui.eXeToolbar', {
                                 accesskey: 's',
                                 text: _('Style Manager')
                             },
+                            // Style designer
+                            {
+                                xtype: 'accesskey_menuitem',
+								style: {
+									display: "none"
+								},						
+                                text: _('Style Designer'),
+                                menu: {
+                                    xtype: 'menu',
+                                    items: [
+                                        {
+                                            xtype: 'accesskey_menuitem',
+                                            itemId: 'style_designer_new_style',
+                                            accesskey: 'i',
+                                            text: _('Create new Style')
+                                        },
+                                        {
+                                            xtype: 'accesskey_menuitem',
+                                            itemId: 'style_designer_edit_style',
+                                            text: _('Edit current Style')
+                                        }
+                                    ]
+                                }
+                            },
+                            // / Style designer							
                             {
                                 xtype: 'accesskey_menuitem',
                                 itemId: 'tools_preferences',
@@ -427,6 +452,13 @@ Ext.define('eXe.view.ui.eXeToolbar', {
                                 itemId: 'help_notes',
                                 accesskey: 'n',
                                 text: _('Release Notes')
+                            },
+                            // jrf - legal notes
+                            {
+                                xtype: 'accesskey_menuitem',
+                                itemId: 'help_legal',
+                                accesskey: 'l',
+                                text: _('Legal Notes')
                             },
                             {
                                 xtype: 'menuseparator'
