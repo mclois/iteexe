@@ -211,6 +211,24 @@ Ext.define('eXe.view.ui.eXeToolbar', {
                             },
                             {
                                 xtype: 'accesskey_menuitem',
+                                text: _('Publish'),
+                                itemId: 'publish',
+                                accesskey: 'l',
+                                menu: {
+                                    xtype: 'menu',
+                                    items: 
+                                    [
+                                        {
+                                        	xtype: 'accesskey_menuitem',
+                                        	text: _('Google Drive'),
+                                        	accesskey: 'G',
+                                        	itemId: 'file_export_googledrive'
+                                         },
+                                    ]
+                                },
+                            },
+                            {
+                                xtype: 'accesskey_menuitem',
                                 text: _('Export'),
                                 accesskey: 'e',
                                 menu: {
@@ -270,11 +288,11 @@ Ext.define('eXe.view.ui.eXeToolbar', {
                                                         itemId: 'file_export_zip'
                                                     },
                                                     {
-                                            		xtype: 'accesskey_menuitem',
-                                            		text: _('Single Page'),
-                                            		accesskey: 'p',
-                                            		itemId: 'file_export_singlepage'
-                                        	    },
+                                                		xtype: 'accesskey_menuitem',
+                                                		text: _('Single Page'),
+                                                		accesskey: 'p',
+                                                		itemId: 'file_export_singlepage'
+                                            	    },
                                                 ]
                                             }
                                         },
