@@ -378,6 +378,28 @@ Ext.define('eXe.view.ui.eXeToolbar', {
                                 accesskey: 's',
                                 text: _('Style Manager')
                             },
+                            // Style designer
+                            {
+                                xtype: 'accesskey_menuitem',
+                                text: _('Style Designer'),
+                                menu: {
+                                    xtype: 'menu',
+                                    items: [
+                                        {
+                                            xtype: 'accesskey_menuitem',
+                                            itemId: 'style_designer_new_style',
+                                            accesskey: 'i',
+                                            text: _('Create new Style')
+                                        },
+                                        {
+                                            xtype: 'accesskey_menuitem',
+                                            itemId: 'style_designer_edit_style',
+                                            text: _('Edit current Style')
+                                        }
+                                    ]
+                                }
+                            },
+                            // / Style designer							
                             {
                                 xtype: 'accesskey_menuitem',
                                 itemId: 'tools_preferences',
@@ -476,13 +498,6 @@ Ext.define('eXe.view.ui.eXeToolbar', {
                             },
                             {
                                 xtype: 'menuseparator'
-                            },
-			    // New link menu to exelearning downloads web
-                            {
-                                xtype: 'accesskey_menuitem',
-                                itemId: 'help_last',
-                                accesskey: 'l',
-                                text: _('Last Release')
                             },
                             {
                                 xtype: 'accesskey_menuitem',
