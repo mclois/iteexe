@@ -992,3 +992,22 @@ def nodeHasTooltips(node):
         if ideviceHasTooltips(idevice):
             return True
     return False
+
+
+## Added for [#2501] Add masteryscore to manifest in evaluable nodes
+## Maybe we should reorder all this common code and move it to an Objecto Oriented logic
+def hasQuizTest(node):
+    for idevice in node.idevices:
+        if hasattr(idevice, "isQuiz"):
+            if idevice.isQuiz == True:
+                return True
+    return False
+
+## Added for [#2501] Add masteryscore to manifest in evaluable nodes
+## Maybe we should reorder all this common code and move it to an Objecto Oriented logic
+def getQuizTestPassRate(node):
+    for idevice in node.idevices:
+        if hasattr(idevice, "isQuiz"):
+            if idevice.isQuiz == True:
+                return idevice.passRate
+    return False
