@@ -138,6 +138,19 @@ Ext.define('eXe.controller.Toolbar', {
             '#tools_stylemanager': {
                 click: this.toolsStyleManager
             },
+            // Style designer
+            // To do:
+            /* 
+                nav.css:
+                overflow:hidden;white-space:nowrap;text-overflow:ellipsis;padding-right:200px should be applied to #headerContent
+            */
+            '#style_designer_new_style': {
+                click: this.styleDesigner.createStyle
+            },
+            '#style_designer_edit_style': {
+                click: this.styleDesigner.editStyle
+            },
+            // / Style designer            
             '#tools_preferences': {
                 click: this.toolsPreferences
             },
@@ -158,7 +171,7 @@ Ext.define('eXe.controller.Toolbar', {
             //    click: { fn: this.processBrowseEvent, url: 'file://%s/docs/manual/Online_manual.html' }
             // },
             '#help_tutorial': {
-                click: { fn: this.processBrowseEvent, url: 'http://exelearning.net/html_manual/exe20_en/' }
+                click: { fn: this.processBrowseEvent, url: _('http://exelearning.net/html_manual/exe20_en/') }
             },
             '#help_notes': {
                 click: { fn: this.releaseNotesPage }
@@ -168,16 +181,16 @@ Ext.define('eXe.controller.Toolbar', {
                 click: this.legalPage
             },
             '#help_website': {
-                click: { fn: this.processBrowseEvent, url: 'http://exelearning.net/' }
+                click: { fn: this.processBrowseEvent, url: _('http://exelearning.net/?lang=en') }
             },
             '#help_issue': {
-                click: { fn: this.processBrowseEvent, url: 'https://forja.cenatic.es/tracker/?group_id=197' }
+                click: { fn: this.processBrowseEvent, url: _('https://forja.cenatic.es/tracker/?group_id=197') }
             },
             '#help_forums': {
-                click: { fn: this.processBrowseEvent, url: 'http://exelearning.net/forums/' }
+                click: { fn: this.processBrowseEvent, url: _('http://exelearning.net/forums/') }
             },
             '#help_last': {
-                click: { fn: this.processBrowseEvent, url: 'http://exelearning.net/downloads/' }
+                click: { fn: this.processBrowseEvent, url: _('http://exelearning.net/downloads/') }
             },
             '#help_about': {
                 click: this.aboutPage
@@ -443,6 +456,112 @@ Ext.define('eXe.controller.Toolbar', {
         });
         stylemanager.show();        
 	},
+    
+	// Style designer
+	styleDesigner : {
+		open : function(btn,text){
+			Ext.Msg.alert(_('New Style'), _("Your Style has been created. Time to make it pretty."),function(){
+				alert("Creo el directorio, etc.: "+text+"\n\nMira cómo se le pasa el estilo por GET en editStyle.");
+				var lang = "en"; // Default language
+				var l = document.documentElement.lang;
+				if (l && l!="") lang = l;				
+				styleDesignerWindow = window.open("/tools/style-designer/previews/website/?lang="+lang);
+			});
+		},
+		createStyle : function(){
+			Ext.MessageBox.prompt(_("New Style"), 'Please enter the new Style name:', this.styleDesigner.open);
+		},
+		notCompatitle : function(){
+			Ext.Msg.alert("", _("The current Style is not compatible with the Style Designer"));
+		},
+		error : function(){
+			Ext.Msg.alert(_('Error'), _("An unknown error occurred."));
+		},	
+		createNewStyleInstead : function(){
+			Ext.Msg.alert(_('Information'), _("That's one of eXe's default Styles, and it cannot be edited.\n\nPlease choose a different Style or create a new one."));
+		},
+		errorSaving : function(){
+			Ext.Msg.alert(_('Error'), _("Your Style could not be saved because an unknown error occurred."));
+		},
+		saveStyle : function(content,nav) {
+			alert('Hay que guardar los cambios (esta función está en Toolbar.js).\n\nRecibo dos parámetros: el contenido de content.css y el de nav.css.\n\nEso es lo que hay que guardar');
+			Ext.Ajax.request({
+				url: window.location.href, // Replace this URL with the one that saves
+				scope: this,
+				success: function(response) {
+					alert("Recibo la respuesta (response.responseText) con un mensaje de éxito o error y lo muestro con Ext.Msg.alert.");
+					try {
+						styleDesignerWindow.styleDesignerPopup.close();
+						styleDesignerWindow.close();
+					} catch(e) {
+						
+					}
+				},
+				error: function(){
+					this.styleDesigner.errorSaving();
+				}
+			});
+			
+		},
+		editStyle : function(){
+			
+			var stylePath = this.styleDesigner.getCurrentStyleFilePath();
+			
+			// We check if the Style is in the list exelearning-default-styles.txt
+			// In that case, you cannot edit it
+			var styleName = stylePath.replace("/style/","").split("/")[0];
+			if (styleName=="base") {
+				this.styleDesigner.createNewStyleInstead();
+				return false;
+			}
+			Ext.Ajax.request({
+				url: "/tools/style-designer/exelearning-default-styles.txt",
+				scope: this,
+				success: function(response) {
+					var res = response.responseText;
+					if (res.indexOf(","+styleName)!=-1) {
+						this.styleDesigner.createNewStyleInstead();
+					} else {
+						// We check if the Style is compatible with the tool
+						Ext.Ajax.request({
+							url: stylePath,
+							scope: this,
+							success: function(response) {
+								var res = response.responseText;
+								if (res.indexOf("/* eXeLearning Style Designer Compatible Style */")!=0) {
+									this.styleDesigner.notCompatitle();
+								} else {
+									// If it's compatible, we open the Style designer
+									var lang = "en"; // Default language
+									var l = document.documentElement.lang;
+									if (l && l!="") lang = l;
+									styleDesignerWindow = window.open("/tools/style-designer/previews/website/?style="+this.styleDesigner.getCurrentStyleId()+"&lang="+lang);		
+								}
+							},
+							error: function(){
+								this.styleDesigner.error();
+							}
+						});
+					}
+				},
+				error: function(){
+					this.styleDesigner.error();
+				}
+			});
+			
+		},
+		getCurrentStyleId : function(){
+			var id = this.getCurrentStyleFilePath();
+			id = id.replace("/","");
+			id = id.split("/")[1];
+			return id;
+		},
+		getCurrentStyleFilePath : function(){ // It returns "/style/INTEF/content.css", being X your style
+			return document.getElementsByTagName("IFRAME")[0].contentWindow.exe_style;
+		}
+	},
+	// / Style designer    
+    
     fileQuit: function() {
 	    this.saveWorkInProgress();
 	    this.askDirty("eXe.app.getController('Toolbar').doQuit()", "quit");

@@ -17,11 +17,12 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 # ===========================================================================
-from exe.engine.resource import Resource
+
 """
 WebsiteExport will export a package as a website of HTML pages
 """
 
+import sys
 import logging
 import re
 import imp
@@ -29,6 +30,7 @@ from shutil                   import rmtree
 from exe.engine.path          import Path, TempDirPath
 from exe.export.pages         import uniquifyNames
 from exe.export.websitepage   import WebsitePage
+from exe.engine.resource      import Resource
 from zipfile                  import ZipFile, ZIP_DEFLATED
 from exe.webui                import common
 from exe.webui.livepage       import allSessionClients
@@ -46,6 +48,7 @@ from oauth2client.client      import AccessTokenCredentials
 from apiclient                import errors
 from apiclient.discovery      import build
 from apiclient.http           import MediaFileUpload
+from nevow.livepage           import jquote
 
 log = logging.getLogger(__name__)
 
@@ -187,12 +190,15 @@ class WebsiteExport(object):
             # Creates a new temporary dir to export the package to, it will be deleted
             # once the export process is finished
             self.filename = Path(mkdtemp())
-            self.gDriveNotificationStatus(client, _(u'Exporting package as web site in: %s') % (self.filename))
+            self.gDriveNotificationStatus(client, _(u'Exporting package as web site in: %s') % (jquote(self.filename)))
             outputDir = self.export(package)
             
             self.gDriveNotificationStatus(client, _(u'Starting authorized connection to Google Drive API'))
             credentials = AccessTokenCredentials(auth_token, user_agent)
-            http = httplib2.Http()
+            ca_certs = None
+            if hasattr(sys, 'frozen'):
+                ca_certs = 'cacerts.txt'
+            http = httplib2.Http(ca_certs=ca_certs)
             http = credentials.authorize(http)
             drive_service = build('drive', 'v2', http=http)
             
@@ -378,6 +384,7 @@ class WebsiteExport(object):
         hasMagnifier      = False
         hasXspfplayer     = False
         hasGallery        = False
+        hasFX             = False
         hasWikipedia      = False
         isBreak           = False
         hasInstructions   = False
@@ -388,7 +395,7 @@ class WebsiteExport(object):
             if isBreak:
                 break
             for idevice in page.node.idevices:
-                if (hasFlowplayer and hasMagnifier and hasXspfplayer and hasGallery and hasWikipedia and hasInstructions and hasMediaelement and hasTooltips):
+                if (hasFlowplayer and hasMagnifier and hasXspfplayer and hasGallery and hasFX and hasWikipedia and hasInstructions and hasMediaelement and hasTooltips):
                     isBreak = True
                     break
                 if not hasFlowplayer:
@@ -402,6 +409,8 @@ class WebsiteExport(object):
                         hasXspfplayer = True
                 if not hasGallery:
                     hasGallery = common.ideviceHasGallery(idevice)
+                if not hasFX:
+                    hasFX = common.ideviceHasFX(idevice)
                 if not hasWikipedia:
                     if 'WikipediaIdevice' == idevice.klass:
                         hasWikipedia = True
@@ -427,6 +436,9 @@ class WebsiteExport(object):
         if hasGallery:
             exeLightbox = (self.scriptsDir/'exe_lightbox')
             exeLightbox.copyfiles(outputDir)
+        if hasFX:
+            exeEffects = (self.scriptsDir/'exe_effects')
+            exeEffects.copyfiles(outputDir)
         if hasWikipedia:
             wikipediaCSS = (self.cssDir/'exe_wikipedia.css')
             wikipediaCSS.copyfile(outputDir/'exe_wikipedia.css')

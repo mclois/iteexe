@@ -9,11 +9,15 @@ var tinyMCE_language = getTinyMCELang(document.getElementsByTagName("HTML")[0].l
 /****************************************/
 var $exeTinyMCE = {
     
-    plugins : "blockquoteandcite,definitionlist,tooltip,clearfloat,advalign,autolink,lists,pagebreak,style,layer,table,advhr,advimage,advlink,emotions,iespell,insertdatetime,preview,media,exemath,searchreplace,print,contextmenu,paste,directionality,fullscreen,noneditable,visualchars,nonbreaking,xhtmlxtras,template,wordcount,advlist,visualblocks,pastecode,inlinepopups,spellchecker,template",
-    buttons1 : "newdocument,spellchecker,|,bold,italic,underline,strikethrough,|,justifyleft,justifycenter,justifyright,justifyfull,clearfloat,|,bullist,numlist,definitionlist,|,outdent,indent,blockquote,blockquoteandcite,|,formatselect,fontsizeselect,fontselect,|,forecolor,backcolor,|,sub,sup,|,fullscreen",
-    buttons2 : "undo,redo,|,cut,copy,paste,pastetext,pasteword,|,pastehtml,pastecode,|,search,replace,|,link,unlink,anchor,tooltip,|,image,media,|,removeformat,cleanup,|,insertdate,inserttime,advhr,cite,abbr,acronym,del,ins,attribs,nonbreaking,|,charmap,exemath,|,styleprops",
-    buttons3 : "template,|,tablecontrols,|,code,help",
+    plugins : "exeeffects,addcontent,blockquoteandcite,definitionlist,tooltip,clearfloat,advalign,autolink,lists,pagebreak,style,layer,table,advhr,advimage,advlink,emotions,iespell,insertdatetime,preview,media,exemath,searchreplace,print,contextmenu,paste,directionality,fullscreen,noneditable,visualchars,nonbreaking,xhtmlxtras,template,wordcount,advlist,visualblocks,pastecode,inlinepopups,spellchecker,template,codemagic",
+    buttons1 : "newdocument,spellchecker,|,bold,italic,underline,strikethrough,|,justifyleft,justifycenter,justifyright,justifyfull,clearfloat,addcontent,|,bullist,numlist,definitionlist,|,outdent,indent,blockquote,blockquoteandcite,|,formatselect,fontsizeselect,fontselect,|,forecolor,backcolor,|,sub,sup,|,fullscreen",
+    buttons2 : "undo,redo,|,cut,copy,paste,pastetext,pasteword,|,pastehtml,pastecode,|,search,replace,|,link,unlink,anchor,tooltip,|,image,media,exeeffects,|,removeformat,cleanup,|,insertdate,inserttime,advhr,cite,abbr,acronym,del,ins,attribs,nonbreaking,|,charmap,exemath,|,styleprops",
+    buttons3 : "template,|,tablecontrols,|,codemagic,help",
     templates : "/scripts/tinymce_templates/lang/"+tinyMCE_language+".js",
+    content_css : "/css/extra.css," + exe_style,
+    theme : "advanced",
+    skin : "default",
+    skin_variant : "",
     
 	init : function(mode,criteria,hide){
 		
@@ -27,10 +31,12 @@ var $exeTinyMCE = {
 			mode : mode,
 			elements : criteria,
 			editor_selector : criteria,	
-			theme : "advanced",
+			theme : this.theme,
+			skin : this.skin,
+			skin_variant : this.skin_variant,
 			convert_urls : false,
 			schema : this.getSchema(),
-			content_css : "/css/extra.css," + exe_style,
+			content_css : this.content_css,
 			height : h,
 			width : w,
 			plugins : this.plugins,

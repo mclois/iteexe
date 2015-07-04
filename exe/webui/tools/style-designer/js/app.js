@@ -106,7 +106,7 @@ var $app = {
 	defaultMark : "/* eXeLearning Style Designer (default CSS) */",
 	init : function() {
 	
-		if (!opener) {
+		if (!opener || !opener.opener) {
 			this.quit($i18n.No_Opener_Error);
 			return false;
 		}
@@ -131,22 +131,70 @@ var $app = {
 		this.isOldBrowser = false;
 		var ie = this.checkIE;
 		if (ie && ie<9) this.isOldBrowser = true;
+		
+		$("#restore").click(function(){
+			Ext.Msg.show({
+				title: $i18n.Information,
+				msg: $i18n.Restore_Instructions,
+				buttonText: {yes:$i18n.OK}
+			});			
+		});
+
+		$("#saveAs").click(function(){
+			$app.getPreview();
+			var content = $("#my-content-css").val();
+			var nav = $("#my-nav-css").val();
+			Ext.Msg.show({
+				title: $i18n.Save_as,
+				msg: $i18n.Save_as_dialog_instructions,
+				prompt: true,
+				buttonText: {yes:$i18n.Save, no:$i18n.Cancel},
+				fn: function(button,txt) {
+					if (button === 'yes') {
+						alert("Guardamos una copia llamada "+txt+"\n\nLas variables content y nav contienen el código CSS a guardar.\n\nSeguimos editando "+txt+".");
+					}
+				}
+			});	
+		});
 
 		$("#save").click(function(){
 			$app.getPreview();
 			var content = $("#my-content-css").val();
 			var nav = $("#my-nav-css").val();
-			try {
-				if (confirm($i18n.Finish_confirmation)) {
-					opener.opener.eXe.app.getController('Toolbar').styleDesigner.saveStyle(content,nav);
+			Ext.Msg.show({
+				title: $i18n.Confirm,
+				msg: $i18n.Save_confirmation,
+				buttonText: {yes:$i18n.Yes, no:$i18n.No},
+				fn: function(button) {
+					if (button === 'yes') {
+						alert("Guardamos los cambios.\n\nLas variables content y nav contienen el código CSS a guardar.\n\nSeguimos editando.");
+					}
 				}
-			} catch(e) {
-				// To do (show the content.css and the nav.css tabs and tell the user to copy their content)
-				alert($i18n.No_Opener_Error);
-			}
-		});
-		$("#restore").click(function(){
-			alert($i18n.Restore_Instructions);
+			});
+		});		
+
+		$("#finish").click(function(){
+			$app.getPreview();
+			var content = $("#my-content-css").val();
+			var nav = $("#my-nav-css").val();
+			Ext.Msg.show({
+				title: $i18n.Confirm,
+				msg: $i18n.Finish_confirmation,
+				buttonText: {yes:$i18n.Yes, no:$i18n.No},
+				fn: function(button) {
+					if (button === 'yes') {
+						try {
+							opener.opener.eXe.app.getController('Toolbar').styleDesigner.saveStyle(content,nav);	
+						} catch(e){
+							Ext.Msg.show({
+								title: $i18n.Information,
+								msg: $i18n.No_Opener_Error,
+								buttonText: {yes:$i18n.OK}
+							});
+						}
+					}
+				}
+			});
 		});
 		
 		this.stylePath = opener.$designer.styleBasePath;
@@ -157,8 +205,16 @@ var $app = {
 	quit : function(msg){
 		document.title = msg;
 		$("#cssWizard").hide();
-		alert(msg+"\n\n"+$i18n.Quit_Warning);
-		window.close();
+		Ext.Msg.show({
+			title: "",
+			msg: msg+"\n\n"+$i18n.Quit_Warning,
+			buttonText: {yes:$i18n.OK},
+				fn: function(button,txt) {
+					if (button === 'yes') {
+						window.close();
+					}
+				}
+		});
 	},
 	updateTextFieldFromFile : function(e){
 		// opener.parent.opener.document.getElementsByTagName("IFRAME")[0].contentWindow;

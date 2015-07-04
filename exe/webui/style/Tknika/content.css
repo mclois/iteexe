@@ -10,7 +10,7 @@ body{
 }
 
 a{
-	color:#919D22;
+	color:#707820;
 }
 
 #header,#emptyHeader{
@@ -73,7 +73,7 @@ a{
 	text-align:left;
 }
 
-#main h2{
+h2{
 	font-size: 1.4em;
 	color: #4d4d4d;
 }
@@ -175,7 +175,7 @@ a{
 .iDevice_inner{
 	color: #444;
 	border-radius: 2px;
-	background-color: #D6E178;
+	background-color: #EAF2A8;
 	background-image: url(idevice_lateral.gif);
 	background-repeat: repeat-y;
 	background-position: 0px 0px;
@@ -287,8 +287,35 @@ li{
 	clip:rect(0,0,0,0);
 	height:0;
 }
+tr:nth-child(2n+1) {
+	background-color: #999;
+	color: #fff
+}
+tr:nth-child(2n) {
+	background-color: #666;
+	color: #fff
+}
+table{
+	border-spacing: 0px;
+	}
+	 td {
+	border: 1px solid #fff;
+	padding-top: 2px;
+	padding-right: 4px;
+	padding-bottom: 2px;
+	padding-left: 4px;
+}
+ th{
+	border: thin solid #fff;
+	background-color: #919D22;
+	color: #fff;
+	text-align: center;
+	text-transform: capitalize;	
+	}
+
 @media (max-width: 700px) {
 	#main .iDeviceTitle{
 	font-size: 1.4em;		
 		}
 	}
+	
