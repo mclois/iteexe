@@ -333,6 +333,11 @@ xsi:schemaLocation="http://www.imsglobal.org/xsd/imscc/imscp_v1p1 imscp_v1p1.xsd
         else:
             self.itemStr += escape(page.node.titleShort)
         self.itemStr += "</title>\n"
+
+        ## SCORM 12 specific metadata: Mastery Score is an ADL extension to the IMS Content Packaging Information Model
+        ## Added for FR [#2501] Add masteryscore to manifest in evaluable nodes
+        if self.scormType == "scorm1.2" and common.hasQuizTest(page.node):
+            self.itemStr += "    <adlcp:masteryscore>%s</adlcp:masteryscore>\n" % common.getQuizTestPassRate(page.node)
         
         ## RESOURCES
         
@@ -392,6 +397,9 @@ xsi:schemaLocation="http://www.imsglobal.org/xsd/imscc/imscp_v1p1 imscp_v1p1.xsd
         
         if common.hasGalleryIdevice(page.node):
             resources = resources + [f.basename() for f in (self.config.webDir/"scripts"/'exe_lightbox').files()]
+            
+        if common.hasFX(page.node):
+            resources = resources + [f.basename() for f in (self.config.webDir/"scripts"/'exe_effects').files()]
 
         for resource in resources:            
             fileStr += "    <file href=\""+escape(resource)+"\"/>\n"
@@ -572,6 +580,7 @@ class ScormExport(object):
         hasMagnifier      = False
         hasXspfplayer     = False
         hasGallery        = False
+        hasFX             = False
         hasWikipedia      = False
         isBreak           = False
         hasInstructions   = False
@@ -582,7 +591,7 @@ class ScormExport(object):
             if isBreak:
                 break
             for idevice in page.node.idevices:
-                if (hasFlowplayer and hasMagnifier and hasXspfplayer and hasGallery and hasWikipedia and hasInstructions and hasMediaelement and hasTooltips):
+                if (hasFlowplayer and hasMagnifier and hasXspfplayer and hasGallery and hasFX and hasWikipedia and hasInstructions and hasMediaelement and hasTooltips):
                     isBreak = True
                     break
                 if not hasFlowplayer:
@@ -596,6 +605,8 @@ class ScormExport(object):
                         hasXspfplayer = True
                 if not hasGallery:
                     hasGallery = common.ideviceHasGallery(idevice)
+                if not hasFX:
+                    hasFX = common.ideviceHasFX(idevice)
                 if not hasWikipedia:
                     if 'WikipediaIdevice' == idevice.klass:
                         hasWikipedia = True
@@ -621,6 +632,9 @@ class ScormExport(object):
         if hasGallery:
             exeLightbox = (self.scriptsDir/'exe_lightbox')
             exeLightbox.copyfiles(outputDir)
+        if hasFX:
+            exeEffects = (self.scriptsDir/'exe_effects')
+            exeEffects.copyfiles(outputDir)
         if hasWikipedia:
             wikipediaCSS = (self.cssDir/'exe_wikipedia.css')
             wikipediaCSS.copyfile(outputDir/'exe_wikipedia.css')

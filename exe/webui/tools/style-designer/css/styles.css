@@ -1,3 +1,14 @@
+/* Reset ext-all-gray.css */
+#cssWizard,.jPicker{font-size: 11px;line-height:1.5em;font-family: Verdana, Arial, Helvetica, sans-serif}
+#cssWizard .panel{height:440px}
+#cssWizard fieldset{padding:4px 9px}
+#content-css fieldset,#nav-css fieldset{padding-bottom:1em}
+#cssWizard legend{padding:0 4px}
+#cssWizard p.checkbox{margin-left:4px}
+.jPicker .Grid{margin-bottom:10px}
+tr.Hex input.Hex{margin-bottom:10px}
+.jPicker .Grid span.QuickColor{height:19px!important;width:19px!important}
+.x-mask {filter:progid:DXImageTransform.Microsoft.Alpha(Opacity=85);opacity:0.85}
 /* Generic */
 body {
 font-family:Verdana, Arial, Helvetica, sans-serif; font-size:11px;
@@ -21,7 +32,7 @@ a img{border:none}
 a:link, a:visited {color:black;}
 a:hover {color:#2B6FB6;}
 .nowrap {white-space: nowrap}
-h1,.scr-av{position:absolute;overflow:hidden;clip:rect(0,0,0,0);height:0}
+.scr-av{position:absolute;overflow:hidden;clip:rect(0,0,0,0);height:0}
 h3{font-size:1.1em}
 
 /* Forms */
@@ -67,10 +78,10 @@ p.checkbox{margin-top:5px}
 #tables .field label{width:130px}
 
 /* Buttons */
-#save, #preview, input.button, #restore {
+.mceActionPanel input {
 border:0; margin:0; padding:0;
 font-weight:bold;
-width:94px; height:26px;
+width:104px; height:26px;
 background:url(../images/default/buttons.png) 0 -26px;
 cursor:pointer;
 padding-bottom:2px;
@@ -93,7 +104,7 @@ padding-bottom:2px;
 .tabs a:link, .tabs a:visited, .tabs a:hover {color:black;}
 
 /* Panels */
-.panel{height:420px;padding:10px}
+.panel{height:420px;padding:10px;max-width:612px}
 .panel_wrapper{position:relative}
 #css-warning{position:absolute;bottom:10px;color:#555;margin:0 10px;font-size:10px}
 .panel_wrapper div.panel {display:none;}

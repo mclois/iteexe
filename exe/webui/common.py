@@ -66,7 +66,108 @@ def docType():
         return '<!DOCTYPE html>'+lb
     else:
         return (u'<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">'+lb)
-            
+
+def renderLicense(plicense,mode="export"):
+    """
+    Returns an XHTML string rendering the license.
+    """
+    licenses = {"license GFDL": "http://www.gnu.org/copyleft/fdl.html",
+                "creative commons: attribution 2.5": "http://creativecommons.org/licenses/by/2.5/",
+                "creative commons: attribution - share alike 2.5": "http://creativecommons.org/licenses/by-sa/2.5/",
+                "creative commons: attribution - non derived work 2.5": "http://creativecommons.org/licenses/by-nd/2.5/",
+                "creative commons: attribution - non commercial 2.5": "http://creativecommons.org/licenses/by-nc/2.5/",
+                "creative commons: attribution - non commercial - share alike 2.5": "http://creativecommons.org/licenses/by-nc-sa/2.5/",
+                "creative commons: attribution - non derived work - non commercial 2.5": "http://creativecommons.org/licenses/by-nc-nd/2.5/",
+                "creative commons: attribution 3.0": "http://creativecommons.org/licenses/by/3.0/",
+                "creative commons: attribution - share alike 3.0": "http://creativecommons.org/licenses/by-sa/3.0/",
+                "creative commons: attribution - non derived work 3.0": "http://creativecommons.org/licenses/by-nd/3.0/",
+                "creative commons: attribution - non commercial 3.0": "http://creativecommons.org/licenses/by-nc/3.0/",
+                "creative commons: attribution - non commercial - share alike 3.0": "http://creativecommons.org/licenses/by-nc-sa/3.0/",
+                "creative commons: attribution - non derived work - non commercial 3.0": "http://creativecommons.org/licenses/by-nc-nd/3.0/",
+                "creative commons: attribution 4.0": "http://creativecommons.org/licenses/by/4.0/",
+                "creative commons: attribution - share alike 4.0": "http://creativecommons.org/licenses/by-sa/4.0/",
+                "creative commons: attribution - non derived work 4.0": "http://creativecommons.org/licenses/by-nd/4.0/",
+                "creative commons: attribution - non commercial 4.0": "http://creativecommons.org/licenses/by-nc/4.0/",
+                "creative commons: attribution - non commercial - share alike 4.0": "http://creativecommons.org/licenses/by-nc-sa/4.0/",
+                "creative commons: attribution - non derived work - non commercial 4.0": "http://creativecommons.org/licenses/by-nc-nd/4.0/",
+                "free software license GPL": "http://www.gnu.org/copyleft/gpl.html"
+               }
+    licenses_names = {"license GFDL": c_("GNU Free Documentation License"),
+                      "creative commons: attribution 2.5": c_("Creative Commons Attribution License 2.5"),
+                      "creative commons: attribution - share alike 2.5": c_("Creative Commons Attribution Share Alike License 2.5"),
+                      "creative commons: attribution - non derived work 2.5": c_("Creative Commons Attribution No Derivatives License 2.5"),
+                      "creative commons: attribution - non commercial 2.5": c_("Creative Commons Attribution Non-commercial License 2.5"),
+                      "creative commons: attribution - non commercial - share alike 2.5": c_("Creative Commons Attribution Non-commercial Share Alike License 2.5"),
+                      "creative commons: attribution - non derived work - non commercial 2.5": c_("Creative Commons Attribution Non-commercial No Derivatives License 2.5"),
+                      "creative commons: attribution 3.0": c_("Creative Commons Attribution License 3.0"),
+                      "creative commons: attribution - share alike 3.0": c_("Creative Commons Attribution Share Alike License 3.0"),
+                      "creative commons: attribution - non derived work 3.0": c_("Creative Commons Attribution No Derivatives License 3.0"),
+                      "creative commons: attribution - non commercial 3.0": c_("Creative Commons Attribution Non-commercial License 3.0"),
+                      "creative commons: attribution - non commercial - share alike 3.0": c_("Creative Commons Attribution Non-commercial Share Alike License 3.0"),
+                      "creative commons: attribution - non derived work - non commercial 3.0": c_("Creative Commons Attribution Non-commercial No Derivatives License 3.0"),
+                      "creative commons: attribution 4.0": c_("Creative Commons Attribution License 4.0"),
+                      "creative commons: attribution - share alike 4.0": c_("Creative Commons Attribution Share Alike License 4.0"),
+                      "creative commons: attribution - non derived work 4.0": c_("Creative Commons Attribution No Derivatives License 4.0"),
+                      "creative commons: attribution - non commercial 4.0": c_("Creative Commons Attribution Non-commercial License 4.0"),
+                      "creative commons: attribution - non commercial - share alike 4.0": c_("Creative Commons Attribution Non-commercial Share Alike License 4.0"),
+                      "creative commons: attribution - non derived work - non commercial 4.0": c_("Creative Commons Attribution Non-commercial No Derivatives License 4.0"),
+                      "free software license GPL": c_("GNU General Public License")
+                     }
+    licenses_css = {"license GFDL": "gfdl",
+                "creative commons: attribution 2.5": "cc cc-by",
+                "creative commons: attribution - share alike 2.5": "cc cc-by-sa",
+                "creative commons: attribution - non derived work 2.5": "cc cc-by-nd",
+                "creative commons: attribution - non commercial 2.5": "cc cc-by-nc",
+                "creative commons: attribution - non commercial - share alike 2.5": "cc cc-by-nc-sa",
+                "creative commons: attribution - non derived work - non commercial 2.5": "cc cc-by-nc-nd",
+                "creative commons: attribution 3.0": "cc cc-by",
+                "creative commons: attribution - share alike 3.0": "cc cc-by-sa",
+                "creative commons: attribution - non derived work 3.0": "cc cc-by-nd",
+                "creative commons: attribution - non commercial 3.0": "cc cc-by-nc",
+                "creative commons: attribution - non commercial - share alike 3.0": "cc cc-by-nc-sa",
+                "creative commons: attribution - non derived work - non commercial 3.0": "cc cc-by-nc-nd",
+                "creative commons: attribution 4.0": "cc cc-by",
+                "creative commons: attribution - share alike 4.0": "cc cc-by-sa",
+                "creative commons: attribution - non derived work 4.0": "cc cc-by-nd",
+                "creative commons: attribution - non commercial 4.0": "cc cc-by-nc",
+                "creative commons: attribution - non commercial - share alike 4.0": "cc cc-by-nc-sa",
+                "creative commons: attribution - non derived work - non commercial 4.0": "cc cc-by-nc-nd",
+                "free software license GPL": "gpl"
+               } 
+
+    html = ""
+    lb = "\n" #Line breaks
+
+    if plicense in licenses:
+        html += '<div id="packageLicense" class="'+licenses_css[plicense]+'">'+lb
+        html += '<p><span>'
+        html += c_("Licensed under the")
+        html += '</span> '
+        html += '<a rel="license" href="%s">%s</a>' % (licenses[plicense], licenses_names[plicense])
+        if mode == "authoring":
+            html += " <em>"+_('(you can change this in the Properties tab)')+"</em>"
+        else:
+            if plicense == 'license GFDL' and mode != "":
+                html += ' <a href="fdl.html" class="local-version">(%s)</a>' % c_('Local Version')
+        html += '</p>'+lb
+        html += '</div>'+lb
+
+    return html
+  
+def renderFooter(footer):
+    """
+    Returns an XHTML string rendering the footer.
+    """
+    html = ""
+    if footer != "":
+        dT = getExportDocType()
+        footerTag = "div"
+        if dT == "HTML5":
+            footerTag = "footer"        
+        html += '<' + footerTag + ' id="siteFooter">'
+        html += footer + "</" + footerTag + ">"
+    return html
+  
 def themeHasConfigXML(style):
     themePath = Path(G.application.config.stylesDir/style)
     themeXMLFile = themePath.joinpath("config.xml")
@@ -211,6 +312,8 @@ def fieldShowEditMessageEle(element):
     
 def getJavaScriptStrings():
     s = '<script type="text/javascript">$exe_i18n={'
+    s += 'previous:"'+c_("Previous")+'",'
+    s += 'next:"'+c_("Next")+'",'
     s += 'show:"'+c_("Show")+'",'
     s += 'hide:"'+c_("Hide")+'",'
     s += 'showFeedback:"'+c_("Show Feedback")+'",'
@@ -934,6 +1037,16 @@ def hasWikipediaIdevice(node):
             return True
     return False
 
+def ideviceHasFX(idevice):
+    block = g_blockFactory.createBlock(None, idevice)
+    if not block:
+        log.critical("Unable to render iDevice.")
+        raise Error("Unable to render iDevice.")
+    content = block.renderView('default')
+    if re.search(' class=[\'"]exe-fx', content):
+        return True
+    return False
+    
 def ideviceHasGallery(idevice):
     if idevice.klass == 'GalleryIdevice':
         return True
@@ -946,6 +1059,12 @@ def ideviceHasGallery(idevice):
         return True
     return False
 
+def hasFX(node):
+    for idevice in node.idevices:
+        if ideviceHasFX(idevice):
+            return True
+    return False
+    
 def hasGalleryIdevice(node):
     for idevice in node.idevices:
         if ideviceHasGallery(idevice):
@@ -991,4 +1110,23 @@ def nodeHasTooltips(node):
     for idevice in node.idevices:
         if ideviceHasTooltips(idevice):
             return True
+    return False
+
+
+## Added for [#2501] Add masteryscore to manifest in evaluable nodes
+## Maybe we should reorder all this common code and move it to an Objecto Oriented logic
+def hasQuizTest(node):
+    for idevice in node.idevices:
+        if hasattr(idevice, "isQuiz"):
+            if idevice.isQuiz == True:
+                return True
+    return False
+
+## Added for [#2501] Add masteryscore to manifest in evaluable nodes
+## Maybe we should reorder all this common code and move it to an Objecto Oriented logic
+def getQuizTestPassRate(node):
+    for idevice in node.idevices:
+        if hasattr(idevice, "isQuiz"):
+            if idevice.isQuiz == True:
+                return idevice.passRate
     return False

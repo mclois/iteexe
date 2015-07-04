@@ -48,6 +48,11 @@ input.feedbackbutton{margin:0}
 .block,.feedback{padding:0}
 .feedback{font-family:inherit;font-size:1em}
 li{list-style-position:outside}
+.styled-qc{margin-top:2.5em}
+.styled-qc:before{top:0}
+.exe-dl .icon,.exe-dl-toggler a{width:24px;height:24px;border-radius:12px}
+.exe-dl-toggler a{line-height:22px}
+.js .exe-dl dd{margin-left:44px}
 
 /* Forms */
 input,select{font-size:1em;font-family:inherit}
@@ -72,6 +77,13 @@ input,select{font-size:1em;font-family:inherit}
 /* Lightbox */
 .lightboxOverlay{filter:progid:DXImageTransform.Microsoft.Alpha(Opacity=95);opacity:0.95}
 #lightbox .lb-caption{font-size:1em}
+
+/* Effects - iDevices with emphasis */
+.emphasis1 .exe-fx .fx-C2,
+.emphasis1 .exe-fx .fx-C2 a,
+.emphasis1 .fx-pagination a{
+background:#ededed;
+}
 
 /* eXeLearning Style Designer */
 .iDevice_header{
