@@ -40,6 +40,7 @@ from exe.jsui.idevicepane        import IdevicePane
 from exe.jsui.outlinepane        import OutlinePane
 from exe.jsui.recentmenu         import RecentMenu
 from exe.jsui.stylemenu          import StyleMenu
+from exe.jsui.styledesignersave  import StyleDesignerSave
 from exe.jsui.propertiespage     import PropertiesPage
 from exe.webui.authoringpage     import AuthoringPage
 from exe.webui.stylemanagerpage  import StyleManagerPage
@@ -96,6 +97,8 @@ class MainPage(RenderableLivePage):
         self.idevicePane = IdevicePane(self)
         self.styleMenu = StyleMenu(self)
         self.recentMenu = RecentMenu(self)
+        
+        self.styleDesignerSave = StyleDesignerSave(self)
 
         # And in the main section
         self.propertiesPage = PropertiesPage(self)

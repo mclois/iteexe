@@ -471,7 +471,7 @@ Ext.define('eXe.controller.Toolbar', {
 		createStyle : function(){
 			Ext.MessageBox.prompt(_("New Style"), 'Please enter the new Style name:', this.styleDesigner.open);
 		},
-		notCompatitle : function(){
+		notCompatible : function(){
 			Ext.Msg.alert("", _("The current Style is not compatible with the Style Designer"));
 		},
 		error : function(){
@@ -486,10 +486,17 @@ Ext.define('eXe.controller.Toolbar', {
 		saveStyle : function(content,nav) {
 			alert('Hay que guardar los cambios (esta función está en Toolbar.js).\n\nRecibo dos parámetros: el contenido de content.css y el de nav.css.\n\nEso es lo que hay que guardar');
 			Ext.Ajax.request({
-				url: window.location.href, // Replace this URL with the one that saves
+	    		url: location.pathname + '/styleDesignerSave',
+	    		method: "POST",
+	    		params: {
+	    			'content': content,
+	    			'nav': nav,
+	    		},
 				scope: this,
 				success: function(response) {
-					alert("Recibo la respuesta (response.responseText) con un mensaje de éxito o error y lo muestro con Ext.Msg.alert.");
+					alert("Recibo la respuesta (response.responseText) con un mensaje de éxito y lo muestro con Ext.Msg.alert.");
+					console.log("Ext.Ajax.Request, success");
+					console.log(response);
 					try {
 						styleDesignerWindow.styleDesignerPopup.close();
 						styleDesignerWindow.close();
@@ -498,7 +505,10 @@ Ext.define('eXe.controller.Toolbar', {
 					}
 				},
 				error: function(){
+					alert("Recibo la respuesta (response.responseText) con un mensaje de error.");
 					this.styleDesigner.errorSaving();
+					console.log("Ext.Ajax.Request, erro");
+					console.log(arguments);
 				}
 			});
 			
@@ -529,7 +539,7 @@ Ext.define('eXe.controller.Toolbar', {
 							success: function(response) {
 								var res = response.responseText;
 								if (res.indexOf("/* eXeLearning Style Designer Compatible Style */")!=0) {
-									this.styleDesigner.notCompatitle();
+									this.styleDesigner.notCompatible();
 								} else {
 									// If it's compatible, we open the Style designer
 									var lang = "en"; // Default language

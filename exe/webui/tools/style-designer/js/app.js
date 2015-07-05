@@ -168,6 +168,16 @@ var $app = {
 				fn: function(button) {
 					if (button === 'yes') {
 						alert("Guardamos los cambios.\n\nLas variables content y nav contienen el código CSS a guardar.\n\nSeguimos editando.");
+						try {
+							opener.opener.eXe.app.getController('Toolbar').styleDesigner.saveStyle(content,nav);	
+						}
+						catch(e){
+							Ext.Msg.show({
+								title: $i18n.Information,
+								msg: $i18n.No_Opener_Error,
+								buttonText: {yes:$i18n.OK}
+							});
+						}
 					}
 				}
 			});
@@ -185,7 +195,8 @@ var $app = {
 					if (button === 'yes') {
 						try {
 							opener.opener.eXe.app.getController('Toolbar').styleDesigner.saveStyle(content,nav);	
-						} catch(e){
+						}
+						catch(e){
 							Ext.Msg.show({
 								title: $i18n.Information,
 								msg: $i18n.No_Opener_Error,
