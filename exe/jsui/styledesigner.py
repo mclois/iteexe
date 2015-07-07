@@ -18,7 +18,7 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 # ===========================================================================
 """
-StyleDesignerSave provides the functions to save the Styles edited with the Styles Designer tool
+StyleDesigner provides the functions to create and save the Styles edited with the Styles Designer tool
 """
 
 import logging
@@ -30,11 +30,11 @@ from xml.sax.saxutils import escape
 
 log = logging.getLogger(__name__)
 
-class StyleDesignerSave(Renderable, Resource):
+class StyleDesigner(Renderable, Resource):
     """
-    StyleDesignerSave provides the functions to save the Styles edited with the Styles Designer tool
+    StyleDesigner provides the functions to create and save the Styles edited with the Styles Designer tool
     """
-    name = 'styleDesignerSave'
+    name = 'styleDesigner'
 
     def __init__(self, parent):
         """ 
@@ -51,8 +51,6 @@ class StyleDesignerSave(Renderable, Resource):
         Saves the style and returns a JSON string with the result
         """
         log.debug("Render")
-        content = request.args['content'][0]
-        nav = request.args['nav'][0]
 
         return json.dumps({'success': True, 'data': [], 'responseText': 'OK'})
 
