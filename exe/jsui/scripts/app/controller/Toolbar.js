@@ -19,7 +19,11 @@
 
 Ext.define('eXe.controller.Toolbar', {
     extend: 'Ext.app.Controller',
-    requires: ['eXe.view.forms.PreferencesPanel', 'eXe.view.forms.StyleManagerPanel'],
+    requires: [
+        'eXe.view.forms.PreferencesPanel',
+        'eXe.view.forms.StyleManagerPanel',
+        'eXe.view.forms.StyleDesignerCreate'
+    ],
 	refs: [{
         ref: 'recentMenu',
         selector: '#file_recent_menu'
@@ -469,7 +473,20 @@ Ext.define('eXe.controller.Toolbar', {
 			});
 		},
 		createStyle : function(){
-			Ext.MessageBox.prompt(_("New Style"), 'Please enter the new Style name:', this.styleDesigner.open);
+	        var createstyleform = new Ext.Window ({
+	            maxHeight: eXe.app.getMaxHeight(800),
+	            width: 475,
+	            floating: true,
+	            closable : true,
+	            modal: true,
+	            id: 'styledesignercreatewin',
+	            title: _('Create new style'),
+	            layout: 'fit',
+	            items: {
+	                xtype: 'styledesignercreate'
+	            }
+	        });
+	        createstyleform.show();
 		},
 		notCompatible : function(){
 			Ext.Msg.alert("", _("The current Style is not compatible with the Style Designer"));
@@ -486,7 +503,7 @@ Ext.define('eXe.controller.Toolbar', {
 		saveStyle : function(content,nav) {
 			alert('Hay que guardar los cambios (esta función está en Toolbar.js).\n\nRecibo dos parámetros: el contenido de content.css y el de nav.css.\n\nEso es lo que hay que guardar');
 			Ext.Ajax.request({
-	    		url: location.pathname + '/styleDesignerSave',
+	    		url: location.pathname + '/styleDesigner',
 	    		method: "POST",
 	    		params: {
 	    			'content': content,
