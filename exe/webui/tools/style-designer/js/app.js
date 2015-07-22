@@ -161,26 +161,9 @@ var $app = {
 			$app.getPreview();
 			var content = $("#my-content-css").val();
 			var nav = $("#my-nav-css").val();
-			Ext.Msg.show({
-				title: $i18n.Confirm,
-				msg: $i18n.Save_confirmation,
-				buttonText: {yes:$i18n.Yes, no:$i18n.No},
-				fn: function(button) {
-					if (button === 'yes') {
-						alert("Guardamos los cambios.\n\nLas variables content y nav contienen el código CSS a guardar.\n\nSeguimos editando.");
-						try {
-							opener.opener.eXe.app.getController('Toolbar').styleDesigner.saveStyle(content,nav);	
-						}
-						catch(e){
-							Ext.Msg.show({
-								title: $i18n.Information,
-								msg: $i18n.No_Opener_Error,
-								buttonText: {yes:$i18n.OK}
-							});
-						}
-					}
-				}
-			});
+			// If style has no name, it must be because it has not been saved yet,
+			// open dialog to create a new one
+			$app.createStyle(content, nav);
 		});		
 
 		$("#finish").click(function(){
@@ -194,7 +177,7 @@ var $app = {
 				fn: function(button) {
 					if (button === 'yes') {
 						try {
-							opener.opener.eXe.app.getController('Toolbar').styleDesigner.saveStyle(content,nav);	
+							opener.opener.eXe.app.getController('Toolbar').styleDesigner.saveStyle(content,nav);
 						}
 						catch(e){
 							Ext.Msg.show({
@@ -1020,7 +1003,62 @@ var $app = {
 		
 		// Menu height
 		if (typeof(w.myTheme.setNavHeight)!='undefined') w.myTheme.setNavHeight();
-	}
+	},
+	createStyle : function(content, nav){
+//		opener.opener.eXe.app.getController('Toolbar').styleDesigner.saveStyle(content,nav);
+		createStyleWin = Ext.create('Ext.form.Panel', {
+			renderTo: document.body,
+			url: '/styleDesigner',
+            width: 475,
+            height: 100,
+            maxHeight: opener.opener.eXe.app.getMaxHeight(100),
+            floating: true,
+            closable : true,
+            modal: true,
+            id: 'styledesignercreateform',
+            title: _('Create new style'),
+            layout: 'fit',
+		    bodyPadding: 10,
+		    items: [
+		        {
+		        	xtype: 'textfield',
+		        	fieldLabel: _('Style name'),
+		        	name: 'style_name',
+		        	allowBlank: false,
+		        	vtype: 'alphanum',
+		            width: '100%'
+		        },
+		    ],
+            buttons: [
+               {
+            	   text: _('Continue'),
+            	   handler: function() {
+            		   var form = this.up('form').getForm(); // get the form panel
+            		   if (form.isValid()) { // make sure the form contains valid data before submitting
+            			   form.submit({
+            				   params: {
+            					   contentcss: content,
+            					   navcss: nav,
+            					   action: 'createStyle'
+            				   },
+            				   success: function(form, action) {
+            					   Ext.Msg.alert('Success');
+            					   createStyleWin.close();
+            				   },
+            				   failure: function(form, action) {
+                                  Ext.Msg.alert('Failed');
+           					      createStyleWin.close();
+                               }
+                          });
+                      }
+                      else { // display error alert if the data is invalid
+                          Ext.Msg.alert('Invalid Data', 'Please correct form errors.')
+                      }
+                  }
+              }
+          ]
+		});
+	},
 }
 $(function(){
 	$app.init();

@@ -22,7 +22,6 @@ Ext.define('eXe.controller.Toolbar', {
     requires: [
         'eXe.view.forms.PreferencesPanel',
         'eXe.view.forms.StyleManagerPanel',
-        'eXe.view.forms.StyleDesignerCreate'
     ],
 	refs: [{
         ref: 'recentMenu',
@@ -149,7 +148,7 @@ Ext.define('eXe.controller.Toolbar', {
                 overflow:hidden;white-space:nowrap;text-overflow:ellipsis;padding-right:200px should be applied to #headerContent
             */
             '#style_designer_new_style': {
-                click: this.styleDesigner.createStyle
+                click: this.styleDesigner.open
             },
             '#style_designer_edit_style': {
                 click: this.styleDesigner.editStyle
@@ -463,30 +462,11 @@ Ext.define('eXe.controller.Toolbar', {
     
 	// Style designer
 	styleDesigner : {
-		open : function(btn,text){
-			Ext.Msg.alert(_('New Style'), _("Your Style has been created. Time to make it pretty."),function(){
-				alert("Creo el directorio, etc.: "+text+"\n\nMira cómo se le pasa el estilo por GET en editStyle.");
-				var lang = "en"; // Default language
-				var l = document.documentElement.lang;
-				if (l && l!="") lang = l;				
-				styleDesignerWindow = window.open("/tools/style-designer/previews/website/?lang="+lang);
-			});
-		},
-		createStyle : function(){
-	        var createstyleform = new Ext.Window ({
-	            maxHeight: eXe.app.getMaxHeight(800),
-	            width: 475,
-	            floating: true,
-	            closable : true,
-	            modal: true,
-	            id: 'styledesignercreatewin',
-	            title: _('Create new style'),
-	            layout: 'fit',
-	            items: {
-	                xtype: 'styledesignercreate'
-	            }
-	        });
-	        createstyleform.show();
+		open : function(btn, text){
+			var lang = "en"; // Default language
+			var l = document.documentElement.lang;
+			if (l && l!="") lang = l;				
+			styleDesignerWindow = window.open("/tools/style-designer/previews/website/?lang="+lang);
 		},
 		notCompatible : function(){
 			Ext.Msg.alert("", _("The current Style is not compatible with the Style Designer"));
@@ -500,7 +480,7 @@ Ext.define('eXe.controller.Toolbar', {
 		errorSaving : function(){
 			Ext.Msg.alert(_('Error'), _("Your Style could not be saved because an unknown error occurred."));
 		},
-		saveStyle : function(content,nav) {
+		saveStyle : function(content, nav) {
 			alert('Hay que guardar los cambios (esta función está en Toolbar.js).\n\nRecibo dos parámetros: el contenido de content.css y el de nav.css.\n\nEso es lo que hay que guardar');
 			Ext.Ajax.request({
 	    		url: location.pathname + '/styleDesigner',
