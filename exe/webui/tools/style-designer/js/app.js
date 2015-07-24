@@ -1025,7 +1025,6 @@ var $app = {
 		        	fieldLabel: _('Style name'),
 		        	name: 'style_name',
 		        	allowBlank: false,
-		        	vtype: 'alphanum',
 		            width: '100%'
 		        },
 		    ],
@@ -1042,11 +1041,14 @@ var $app = {
             					   action: 'createStyle'
             				   },
             				   success: function(form, action) {
-            					   Ext.Msg.alert('Success');
+            					   Ext.Msg.alert('Success', action.result.responseText);
+            					   console.log(action)
+            					   alert('Recargar el diseñador, para editar el estilo recién creado en ' + action.result.style_dirname)
             					   createStyleWin.close();
             				   },
             				   failure: function(form, action) {
-                                  Ext.Msg.alert('Failed');
+                                  Ext.Msg.alert('Failed', action.result.responseText);
+           					      console.log(action)
            					      createStyleWin.close();
                                }
                           });
