@@ -5,14 +5,13 @@
  */
 var $designer = {
 	langs : ['en'], // langs : ['en','es',...], (use that if you want the Web Designer to use its own translations instead of eXe's translation mechanism)
-	init : function(){	
+	init : function(){
 		var lang = "en";
 		var sd_style = "base";
 		var sd_href= window.location.href;
-		var sd_href_parts = sd_href.split("?style=");
-		if (sd_href_parts.length==2) {
-			sd_style = sd_href_parts[1];	
-			sd_style = sd_style.split("&")[0];		
+		var sd_href_params = this.getUrlVars(sd_href);
+		if (sd_href_params['style']) {
+			sd_style = sd_href_params['style'];	
 		}
 		this.styleId = sd_style;
 		this.styleBasePath = "/style/"+sd_style+"/";
@@ -26,6 +25,18 @@ var $designer = {
 			}
 		}
 		this.language = lang;
+	},
+	getUrlVars : function(url) {
+		// Read a page's GET URL variables and return them as an associative array.
+	    var vars = [], hash;
+	    var hashes = url.slice(window.location.href.indexOf('?') + 1).split('&');
+	    for(var i = 0; i < hashes.length; i++)
+	    {
+	        hash = hashes[i].split('=');
+	        vars.push(hash[0]);
+	        vars[hash[0]] = hash[1];
+	    }
+	    return vars;
 	},
 	isBrowserCompatible : function(){
 		var n = navigator.userAgent.toLowerCase();
