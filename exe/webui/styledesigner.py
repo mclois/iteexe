@@ -26,6 +26,7 @@ import re
 import os
 import shutil
 import json
+import unicodedata
 try:
     import xml.etree.cElementTree as ET
 except ImportError:
@@ -83,6 +84,23 @@ class StyleDesigner(Renderable, Resource):
         parent.putChild(self.name, self)
         Renderable.__init__(self, parent)
         Resource.__init__(self)
+        
+    def styleIdFromName(self, style_name):
+        """
+        Gets the style ID from the style full name
+        
+        Replaces ' ', '\t', '\f', '\r' with '_', accented with non accented characters,
+        cleans non alphanumeric chars and converts to lower case
+        """
+        style_id = str(style_name)
+        style_id = style_id.lower()
+        style_id = unicodedata.normalize('NFKD', unicode(style_id))
+        style_id = style_id.encode('ascii', 'ignore')
+        
+        clean_non_alphanum = re.compile('\W+')
+        style_id = clean_non_alphanum.sub(' ', style_id).strip()
+                
+        return style_id
 
     def render(self, request=None):
         """
@@ -94,12 +112,7 @@ class StyleDesigner(Renderable, Resource):
             
         try :
             if action == 'createStyle':
-                # Get the style dir name from the style full name, replacing ' ' with '_',
-                # cleaning non alphanumeric chars and converting to lower case
-                style_dirname = request.args['style_name'][0].replace(' ', '_')
-                clean_non_alphanum = re.compile('\W+')
-                style_dirname = clean_non_alphanum.sub(' ', style_dirname).strip()
-                style_dirname = style_dirname.lower()
+                style_dirname = self.styleIdFromName(request.args['style_name'][0])
             
                 style = self.createStyle(style_dirname, request.args)
                 response['style_dirname'] = style.get_dirname()
@@ -107,17 +120,46 @@ class StyleDesigner(Renderable, Resource):
                 response['responseText'] = _('Style %s successfully created!') % (style.get_name())
                 
             if action == 'saveStyle':
-                style_dirname = request.args['style_dirname'][0]
+                style_dirname = request.args['style_name'][0]
                 style = self.saveStyle(style_dirname, request.args)
                 response['style_dirname'] = style.get_dirname()
                 response['success'] = True
-                response['responseText'] = _('Style %s successfully s!') % (style.get_name())
+                response['responseText'] = _('Style %s successfully saved!') % (style.get_name())
         
         except Exception, e:
             response['success'] = False
             response['responseText'] = str(e)
         
         return json.dumps(response)
+    
+    def updateStyle(self, styleDir, contentcss, navcss, style_config):
+        """
+        Overwrite content.css, nav.css and config.xml files with the data given
+        """
+        contentcss_file = open(styleDir / 'content.css', 'w')
+        contentcss_file.write(contentcss)
+        contentcss_file.close()
+        
+        navcss_file = open(styleDir / 'nav.css', 'w')
+        navcss_file.write(navcss)
+        navcss_file.close()
+        
+        theme = ET.Element('theme')
+        ET.SubElement(theme, 'name').text = style_config['name']
+        ET.SubElement(theme, 'version').text = style_config['version']
+        ET.SubElement(theme, 'compatibility').text = style_config['compatibility']
+        ET.SubElement(theme, 'author').text = style_config['author']
+        ET.SubElement(theme, 'author-url').text = style_config['author-url']
+        ET.SubElement(theme, 'license').text = style_config['license']
+        ET.SubElement(theme, 'license-url').text = style_config['license-url']
+        ET.SubElement(theme, 'description').text = style_config['description']
+        
+        configxml = ET.tostring(theme, 'utf-8')
+        configxml_parsed = minidom.parseString(configxml)
+        configxml_pretty = configxml_parsed.toprettyxml(indent = "    ")
+        configxml_file = open(styleDir / 'config.xml', 'w')
+        configxml_file.write(configxml_pretty)
+        configxml_file.close()
     
     def createStyle(self, style_dirname, style_data):
         """
@@ -143,31 +185,18 @@ class StyleDesigner(Renderable, Resource):
                 # Overwrite content.css, nav.css and config.xml files with the data
                 # from the style designer
                 contentcss = style_data['contentcss'][0]
-                contentcss_file = open(styleDir / 'content.css', 'w')
-                contentcss_file.write(contentcss)
-                contentcss_file.close()
-                
                 navcss = style_data['navcss'][0]
-                navcss_file = open(styleDir / 'nav.css', 'w')
-                navcss_file.write(navcss)
-                navcss_file.close()
-                
-                theme = ET.Element('theme')
-                ET.SubElement(theme, 'name').text = style_data['style_name'][0]
-                ET.SubElement(theme, 'version').text = '1.0'
-                ET.SubElement(theme, 'compatibility').text = version.version
-                ET.SubElement(theme, 'author').text = 'eXeLearning.net'
-                ET.SubElement(theme, 'author-url').text = 'http://exelearning.net'
-                ET.SubElement(theme, 'license').text = 'Creative Commons by-sa'
-                ET.SubElement(theme, 'license-url').text = 'http://creativecommons.org/licenses/by-sa/3.0/'
-                ET.SubElement(theme, 'description').text = ''
-                
-                configxml = ET.tostring(theme, 'utf-8')
-                configxml_parsed = minidom.parseString(configxml)
-                configxml_pretty = configxml_parsed.toprettyxml(indent = "    ")
-                configxml_file = open(styleDir / 'config.xml', 'w')
-                configxml_file.write(configxml_pretty)
-                configxml_file.close()
+                configxml = {
+                    'name':  style_data['style_name'][0],
+                    'version': '1.0',
+                    'compatibility': version.version,
+                    'author': 'eXeLearning.net',
+                    'author-url': 'http://exelearning.net',
+                    'license': 'Creative Commons by-sa',
+                    'license-url': 'http://creativecommons.org/licenses/by-sa/3.0/',
+                    'description': '',
+                }
+                self.updateStyle(styleDir, contentcss, navcss, configxml)
                 
                 # New style dir has been created, add style to eXe Styles store
                 style = Style(styleDir)
@@ -185,7 +214,7 @@ class StyleDesigner(Renderable, Resource):
     
     def saveStyle(self, style_dirname, style_data):
         """
-        Updates the style with data given
+        Updates the style with data given from Styles Designer
         """
         styleDir = self.config.stylesDir / style_dirname
         
@@ -197,31 +226,18 @@ class StyleDesigner(Renderable, Resource):
                 # Overwrite content.css, nav.css and config.xml files with the data
                 # from the style designer
                 contentcss = style_data['contentcss'][0]
-                contentcss_file = open(styleDir / 'content.css', 'w')
-                contentcss_file.write(contentcss)
-                contentcss_file.close()
-                
                 navcss = style_data['navcss'][0]
-                navcss_file = open(styleDir / 'nav.css', 'w')
-                navcss_file.write(navcss)
-                navcss_file.close()
-                
-                theme = ET.Element('theme')
-                ET.SubElement(theme, 'name').text = style_data['style_name'][0]
-                ET.SubElement(theme, 'version').text = '1.0'
-                ET.SubElement(theme, 'compatibility').text = version.version
-                ET.SubElement(theme, 'author').text = 'eXeLearning.net'
-                ET.SubElement(theme, 'author-url').text = 'http://exelearning.net'
-                ET.SubElement(theme, 'license').text = 'Creative Commons by-sa'
-                ET.SubElement(theme, 'license-url').text = 'http://creativecommons.org/licenses/by-sa/3.0/'
-                ET.SubElement(theme, 'description').text = ''
-                
-                configxml = ET.tostring(theme, 'utf-8')
-                configxml_parsed = minidom.parseString(configxml)
-                configxml_pretty = configxml_parsed.toprettyxml(indent = "    ")
-                configxml_file = open(styleDir / 'config.xml', 'w')
-                configxml_file.write(configxml_pretty)
-                configxml_file.close()
+                configxml = {
+                    'name':  style_data['style_name'][0],
+                    'version': '1.0',
+                    'compatibility': version.version,
+                    'author': 'eXeLearning.net',
+                    'author-url': 'http://exelearning.net',
+                    'license': 'Creative Commons by-sa',
+                    'license-url': 'http://creativecommons.org/licenses/by-sa/3.0/',
+                    'description': '',
+                }
+                self.updateStyle(styleDir, contentcss, navcss, configxml)
                 
                 style = Style(styleDir)
                 return style
