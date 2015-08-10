@@ -144,26 +144,42 @@ var $app = {
 			$app.getPreview();
 			var content = $("#my-content-css").val();
 			var nav = $("#my-nav-css").val();
-			Ext.Msg.show({
-				title: $i18n.Save_as,
-				msg: $i18n.Save_as_dialog_instructions,
-				prompt: true,
-				buttonText: {yes:$i18n.Save, no:$i18n.Cancel},
-				fn: function(button,txt) {
-					if (button === 'yes') {
-						alert("Guardamos una copia llamada "+txt+"\n\nLas variables content y nav contienen el código CSS a guardar.\n\nSeguimos editando "+txt+".");
-					}
-				}
-			});	
+			$app.createStyle(content, nav);
 		});
 
 		$("#save").click(function(){
 			$app.getPreview();
 			var content = $("#my-content-css").val();
 			var nav = $("#my-nav-css").val();
-			// If style has no name, it must be because it has not been saved yet,
-			// open dialog to create a new one
-			$app.createStyle(content, nav);
+			var currentStyle = $app.getCurrentStyle();
+			
+			if (currentStyle == 'base') {
+				// If user is editing base style it must be because style has not been saved yet,
+				// open dialog to create a new one
+				$app.createStyle(content, nav);
+			}
+			else  {
+				// Send POST request to update current style
+				Ext.Ajax.request({
+				   url: '/styleDesigner',
+				   method: 'POST',
+				   params: {
+					   style_name: currentStyle,
+					   contentcss: content,
+					   navcss: nav,
+					   action: 'saveStyle'
+				   },
+				   success: function(response) {
+					   responseVars = Ext.JSON.decode(response.responseText);
+					   Ext.Msg.alert('Success', responseVars.responseText);
+				   },
+				   failure: function(response) {
+					   responseVars = Ext.JSON.decode(response.responseText);
+					   Ext.Msg.alert('Failed', responseVars.responseText);
+					   console.log(response);
+                   }
+				});
+			}
 		});		
 
 		$("#finish").click(function(){
@@ -209,6 +225,32 @@ var $app = {
 					}
 				}
 		});
+	},
+	loadNewStyle : function(newStyle){
+		var currentStyle = this.getCurrentStyle();
+		var currentURL = opener.window.location.href;
+		var newURL;
+		
+		if (currentStyle != 'base') {
+			newURL = currentURL.replace("style="+currentStyle,"style="+newStyle);
+		}
+		else {
+			var queryStart = currentURL.search("\\?");
+			if (queryStart == -1) {
+				currentURL = currentURL + "?";
+			}
+			else {
+				currentURL = currentURL + "&";
+			}
+			newURL = currentURL + "style="+newStyle;
+		}
+		
+		opener.window.location = newURL;
+	},
+	getCurrentStyle : function() {
+		var currentStyle = this.stylePath;
+		currentStyle = currentStyle.replace("/style/","").replace("/","");
+		return currentStyle;
 	},
 	updateTextFieldFromFile : function(e){
 		// opener.parent.opener.document.getElementsByTagName("IFRAME")[0].contentWindow;
@@ -1042,13 +1084,12 @@ var $app = {
             				   },
             				   success: function(form, action) {
             					   Ext.Msg.alert('Success', action.result.responseText);
-            					   console.log(action)
-            					   alert('Recargar el diseñador, para editar el estilo recién creado en ' + action.result.style_dirname)
+            					   $app.loadNewStyle(action.result.style_dirname);
             					   createStyleWin.close();
             				   },
             				   failure: function(form, action) {
                                   Ext.Msg.alert('Failed', action.result.responseText);
-           					      console.log(action)
+           					      console.log(action);
            					      createStyleWin.close();
                                }
                           });
