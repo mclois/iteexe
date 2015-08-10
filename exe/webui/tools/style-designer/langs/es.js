@@ -105,7 +105,7 @@ var $i18n = {
 	No_Opener_Error : "En Diseñador de Estilos no está abierto.",
 	Quit_Warning : "Esta ventana se va a cerrar. Por favor, vuelve a abrir el Diseñador de Estilos.",
 	Information : "Información",
-	Restore_Instructions : 'Solo tienes que cerrar esta ventana y la vista preliminar sin pulsar en "Finalizar".',
+	Restore_Instructions : '¿Descartar los cambios desde la última vez que guardaste? No se puede deshacer.',
 	OK : "OK",
 	Cancel : "Cancelar",
 	// Color Picker

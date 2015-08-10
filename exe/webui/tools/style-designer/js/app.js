@@ -134,9 +134,16 @@ var $app = {
 		
 		$("#restore").click(function(){
 			Ext.Msg.show({
-				title: $i18n.Information,
+				title: $i18n.Confirm,
 				msg: $i18n.Restore_Instructions,
-				buttonText: {yes:$i18n.OK}
+				buttonText: {yes:$i18n.Yes, no:$i18n.No},
+				fn: function(button) {
+					if (button === 'yes') {
+						// Reload last saved version of current style
+						var currentStyle = $app.getCurrentStyle();
+						$app.loadNewStyle(currentStyle);
+					}
+				}
 			});			
 		});
 
@@ -184,6 +191,7 @@ var $app = {
 
 		$("#finish").click(function(){
 			$app.getPreview();
+			var currentStyle = $app.getCurrentStyle();
 			var content = $("#my-content-css").val();
 			var nav = $("#my-nav-css").val();
 			Ext.Msg.show({
@@ -192,16 +200,28 @@ var $app = {
 				buttonText: {yes:$i18n.Yes, no:$i18n.No},
 				fn: function(button) {
 					if (button === 'yes') {
-						try {
-							opener.opener.eXe.app.getController('Toolbar').styleDesigner.saveStyle(content,nav);
-						}
-						catch(e){
-							Ext.Msg.show({
-								title: $i18n.Information,
-								msg: $i18n.No_Opener_Error,
-								buttonText: {yes:$i18n.OK}
-							});
-						}
+						// Send POST request to update current style
+						Ext.Ajax.request({
+						   url: '/styleDesigner',
+						   method: 'POST',
+						   params: {
+							   style_name: currentStyle,
+							   contentcss: content,
+							   navcss: nav,
+							   action: 'saveStyle'
+						   },
+						   success: function(response) {
+							   responseVars = Ext.JSON.decode(response.responseText);
+							   Ext.Msg.alert('Success', responseVars.responseText);
+							   opener.window.close();
+							   window.close();
+						   },
+						   failure: function(response) {
+							   responseVars = Ext.JSON.decode(response.responseText);
+							   Ext.Msg.alert('Failed', responseVars.responseText);
+							   console.log(response);
+		                   }
+						});
 					}
 				}
 			});
