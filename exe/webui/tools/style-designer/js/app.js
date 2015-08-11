@@ -194,34 +194,42 @@ var $app = {
 			var currentStyle = $app.getCurrentStyle();
 			var content = $("#my-content-css").val();
 			var nav = $("#my-nav-css").val();
+			
 			Ext.Msg.show({
 				title: $i18n.Confirm,
 				msg: $i18n.Finish_confirmation,
 				buttonText: {yes:$i18n.Yes, no:$i18n.No},
 				fn: function(button) {
 					if (button === 'yes') {
-						// Send POST request to update current style
-						Ext.Ajax.request({
-						   url: '/styleDesigner',
-						   method: 'POST',
-						   params: {
-							   style_name: currentStyle,
-							   contentcss: content,
-							   navcss: nav,
-							   action: 'saveStyle'
-						   },
-						   success: function(response) {
-							   responseVars = Ext.JSON.decode(response.responseText);
-							   Ext.Msg.alert('Success', responseVars.responseText);
-							   opener.window.close();
-							   window.close();
-						   },
-						   failure: function(response) {
-							   responseVars = Ext.JSON.decode(response.responseText);
-							   Ext.Msg.alert('Failed', responseVars.responseText);
-							   console.log(response);
-		                   }
-						});
+						if (currentStyle == 'base') {
+							// If user is editing base style it must be because style has not been saved yet,
+							// open dialog to create a new one instead
+							$app.createStyle(content, nav, true);
+						}
+						else  {
+							// Send POST request to update current style
+							Ext.Ajax.request({
+							   url: '/styleDesigner',
+							   method: 'POST',
+							   params: {
+								   style_name: currentStyle,
+								   contentcss: content,
+								   navcss: nav,
+								   action: 'saveStyle'
+							   },
+							   success: function(response) {
+								   responseVars = Ext.JSON.decode(response.responseText);
+								   Ext.Msg.alert('Success', responseVars.responseText);
+								   opener.window.close();
+								   window.close();
+							   },
+							   failure: function(response) {
+								   responseVars = Ext.JSON.decode(response.responseText);
+								   Ext.Msg.alert('Failed', responseVars.responseText);
+								   console.log(response);
+			                   }
+							});
+						}
 					}
 				}
 			});
@@ -1066,8 +1074,11 @@ var $app = {
 		// Menu height
 		if (typeof(w.myTheme.setNavHeight)!='undefined') w.myTheme.setNavHeight();
 	},
-	createStyle : function(content, nav){
+	createStyle : function(content, nav, closeDesigner){
 //		opener.opener.eXe.app.getController('Toolbar').styleDesigner.saveStyle(content,nav);
+		if (closeDesigner == undefined) {
+			closeDesigner = false;
+		}
 		createStyleWin = Ext.create('Ext.form.Panel', {
 			renderTo: document.body,
 			url: '/styleDesigner',
@@ -1106,6 +1117,10 @@ var $app = {
             					   Ext.Msg.alert('Success', action.result.responseText);
             					   $app.loadNewStyle(action.result.style_dirname);
             					   createStyleWin.close();
+            					   if (closeDesigner) {
+            						   opener.window.close();
+            						   window.close();
+            					   }
             				   },
             				   failure: function(form, action) {
                                   Ext.Msg.alert('Failed', action.result.responseText);
