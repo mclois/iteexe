@@ -30,6 +30,8 @@ input.feedbackbutton{margin-top:10px;margin-bottom:10px}
 }
 /* The New eXeLearning */
 /* Include these styles in the old themes */
+.iDevice a,#siteFooter a,#packageLicense a,.toggle-idevice a{text-decoration:underline}
+.iDevice a:hover,#siteFooter a:hover,#packageLicense a:hover,.toggle-idevice a:hover{text-decoration:none}
 .pre-code{background:#112C4A;color:#E7ECF1;font-family:Monaco,Courier,monospace;border-radius:9px;font-size:12px;margin:2em 1em;overflow:auto;padding:20px}
 * html .pre-code{width:90%} /* IE6 */
 .iDevice_content{position:relative;max-width:100%}
@@ -70,6 +72,8 @@ input.feedbackbutton{margin-top:10px;margin-bottom:10px}
 /* JavaScript on/offf */
 .toggle-idevice,.exe-hidden,.js-required,.js .js-hidden{display:none}
 .js .js-required{display:block}
+/* License */
+#packageLicense{text-align:center}
 /* Hints */
 .js #main .iDevice_hint_title{font-size:1em;margin-top:0;font-weight:normal;*margin-top:1em}/* IE6, IE7 */
 .iDevice_hint{margin-bottom:1.5em}
@@ -107,4 +111,6 @@ ol.auto-numbered{counter-reset:item}
 /* Responsive design */
 @media all and (max-width: 780px) {
 	.exe-layout-2-cols .exe-col,.exe-layout-3-cols .exe-col{float:none;width:100%;padding:0}
+	iframe,object,embed{max-width:100%}
+	img,video{max-width:100%;height:auto}    
 }

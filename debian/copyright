@@ -24,13 +24,21 @@ Files: /usr/share/exe/scripts/tinymce_3.5.11/*
 Copyright: Moxiecode Systems AB
 License: LGPL-2.1
 
+Files: /usr/share/exe/scripts/tinymce_3.5.11/jscripts/tiny_mce/themes/advanced/skins/moodle/*
+These files are part of Moodle - http://moodle.org/
+License: GPL-3+
+
 Files: /usr/share/exe/webui/scripts/mediaelement/*
 Copyright: 2013-2015 John Dyer
 License: MIT
 
 Files: /usr/share/exe/webui/scripts/exe_tooltips/
 Copyright: Craig Michael Thompson
-Licnese: MIT | GPL-2
+License: MIT | GPL-2
+
+Files: /usr/share/exe/webui/scripts/exe_effects/exe_effects.js (Timeliner.js 1.x)
+Copyright: Tarek Anandan
+License: CC-BY-SA-3.0
 
 Files: /usr/share/exe/style/*
 Copyright: different authors (see config.xml in each directory).
@@ -78,10 +86,6 @@ License: MIT | GPL-2
 File: exe/webui/tools/style-designer/js/jpicker-1.1.6.min.js
 Copyright: Christopher T. Tillman
 License: MIT
-
-File: exe/webui/tools/style-designer/js/jquery.alerts.js
-Copyright: Cory S.N. LaViska
-License: MIT | GPL
 
 
 License: GPL-2

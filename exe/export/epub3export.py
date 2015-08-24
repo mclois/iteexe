@@ -299,6 +299,7 @@ class Epub3Page(Page):
             html += '<meta http-equiv="content-language" content="' + lenguaje + '" />' + lb
         if self.node.package.author != "":
             html += '<meta name="author" content="' + escape(self.node.package.author, True) + '" />' + lb
+        html += common.getLicenseMetadata(self.node.package.license)
         html += '<meta name="generator" content="eXeLearning ' + release + ' - exelearning.net" />' + lb
         if self.node.id == '0':
             if self.node.package.description != "":
@@ -308,6 +309,8 @@ class Epub3Page(Page):
             html += u"<link rel=\"stylesheet\" type=\"text/css\" href=\"exe_wikipedia.css\" />" + lb
         if common.hasGalleryIdevice(self.node):
             html += u"<link rel=\"stylesheet\" type=\"text/css\" href=\"exe_lightbox.css\" />" + lb
+        if common.hasFX(self.node):
+            html += u"<link rel=\"stylesheet\" type=\"text/css\" href=\"exe_effects.css\" />" + lb
         html += u"<link rel=\"stylesheet\" type=\"text/css\" href=\"content.css\" />" + lb
         if dT == "HTML5" or common.nodeHasMediaelement(self.node):
             html += u'<!--[if lt IE 9]><script type="text/javascript" src="exe_html5.js"></script><![endif]-->' + lb
@@ -324,6 +327,8 @@ class Epub3Page(Page):
 
         if common.hasGalleryIdevice(self.node):
             html += u'<script type="text/javascript" src="exe_lightbox.js"></script>' + lb
+        if common.hasFX(self.node):
+            html += u'<script type="text/javascript" src="exe_effects.js"></script>' + lb
         html += common.getJavaScriptStrings() + lb
         html += u'<script type="text/javascript" src="common.js"></script>' + lb
         if common.hasMagnifier(self.node):
@@ -511,6 +516,7 @@ class Epub3Export(object):
         hasMagnifier = False
         hasXspfplayer = False
         hasGallery = False
+        hasFX = False
         hasWikipedia = False
         isBreak = False
         hasInstructions = False
@@ -520,7 +526,7 @@ class Epub3Export(object):
             if isBreak:
                 break
             for idevice in page.node.idevices:
-                if (hasFlowplayer and hasMagnifier and hasXspfplayer and hasGallery and hasWikipedia):
+                if (hasFlowplayer and hasMagnifier and hasXspfplayer and hasGallery and hasFX and hasWikipedia):
                     isBreak = True
                     break
                 if not hasFlowplayer:
@@ -534,6 +540,8 @@ class Epub3Export(object):
                         hasXspfplayer = True
                 if not hasGallery:
                     hasGallery = common.ideviceHasGallery(idevice)
+                if not hasFX:
+                    hasFX = common.ideviceHasFX(idevice)
                 if not hasWikipedia:
                     if 'WikipediaIdevice' == idevice.klass:
                         hasWikipedia = True
@@ -557,6 +565,9 @@ class Epub3Export(object):
         if hasGallery:
             exeLightbox = (self.scriptsDir / 'exe_lightbox')
             exeLightbox.copyfiles(contentPages)
+        if hasFX:
+            exeEffects = (self.scriptsDir / 'exe_effects')
+            exeEffects.copyfiles(contentPages)
         if hasWikipedia:
             wikipediaCSS = (self.cssDir / 'exe_wikipedia.css')
             wikipediaCSS.copyfile(contentPages / 'exe_wikipedia.css')
