@@ -219,9 +219,14 @@ var $app = {
 							   },
 							   success: function(response) {
 								   responseVars = Ext.JSON.decode(response.responseText);
-								   Ext.Msg.alert('Success', responseVars.responseText);
-								   opener.window.close();
-								   window.close();
+								   Ext.Msg.alert(
+								       'Success',
+								       responseVars.responseText,
+            					       function(btn, txt) {
+										   opener.window.close();
+										   window.close();
+            					       }
+								   );
 							   },
 							   failure: function(response) {
 								   responseVars = Ext.JSON.decode(response.responseText);
@@ -1114,13 +1119,19 @@ var $app = {
             					   action: 'createStyle'
             				   },
             				   success: function(form, action) {
-            					   Ext.Msg.alert('Success', action.result.responseText);
-            					   $app.loadNewStyle(action.result.style_dirname);
-            					   createStyleWin.close();
-            					   if (closeDesigner) {
-            						   opener.window.close();
-            						   window.close();
-            					   }
+            					   Ext.Msg.alert(
+            					       'Success',
+            					       action.result.responseText + '<br/>' + _('Page will be reloaded. '),
+            					       function(btn, txt) {
+            					    	   createStyleWin.close();
+            					    	   $app.loadNewStyle(action.result.style_dirname);
+            					    	   
+                    					   if (closeDesigner) {
+                    						   opener.window.close();
+                    						   window.close();
+                    					   }
+            					       }
+            					   );
             				   },
             				   failure: function(form, action) {
                                   Ext.Msg.alert('Failed', action.result.responseText);
