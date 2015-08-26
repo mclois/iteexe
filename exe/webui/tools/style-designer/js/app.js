@@ -1095,8 +1095,8 @@ var $app = {
             modal: true,
             id: 'styledesignercreateform',
             title: _('Create new style'),
-            layout: 'fit',
-		    bodyPadding: 10,
+		    bodyPadding: 20,
+		    baseCls : 'x-window-default',
 		    items: [
 		        {
 		        	xtype: 'textfield',
