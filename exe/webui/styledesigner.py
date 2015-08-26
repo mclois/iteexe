@@ -99,6 +99,7 @@ class StyleDesigner(Renderable, Resource):
         
         clean_non_alphanum = re.compile('\W+')
         style_id = clean_non_alphanum.sub(' ', style_id).strip()
+        style_id = style_id.replace(' ', '_')
                 
         return style_id
 
