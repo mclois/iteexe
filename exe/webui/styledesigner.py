@@ -107,29 +107,30 @@ class StyleDesigner(Renderable, Resource):
         """
         Saves the style and returns a JSON string with the result
         """
-        action = request.args['action'][0]
-        log.debug("StyleDesigner, action: %s" % (action))
-        response = {}
-            
         try :
+            action = request.args['action'][0]
+            log.debug("StyleDesigner, action: %s" % (action))
+            response = {}
+                
             if action == 'createStyle':
                 style_dirname = self.styleIdFromName(request.args['style_name'][0])
             
                 style = self.createStyle(style_dirname, request.args)
                 response['style_dirname'] = style.get_dirname()
                 response['success'] = True
-                response['responseText'] = _('Style %s successfully created!') % (style.get_name())
+                response['message'] = _('Style %s successfully created!') % (style.get_name())
                 
             if action == 'saveStyle':
                 style_dirname = request.args['style_name'][0]
                 style = self.saveStyle(style_dirname, request.args)
                 response['style_dirname'] = style.get_dirname()
                 response['success'] = True
-                response['responseText'] = _('Style %s successfully saved!') % (style.get_name())
+                response['message'] = _('Style %s successfully saved!') % (style.get_name())
         
         except Exception, e:
-            response['success'] = False
-            response['responseText'] = str(e)
+                # Operation has failed, but we can inform the user about the error
+                response['success'] = False
+                response['message'] = str(e)
         
         return json.dumps(response)
     

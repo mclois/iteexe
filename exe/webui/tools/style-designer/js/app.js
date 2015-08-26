@@ -177,13 +177,18 @@ var $app = {
 					   action: 'saveStyle'
 				   },
 				   success: function(response) {
+					   // AJAX request can success, even if the create/save operation failed
 					   responseVars = Ext.JSON.decode(response.responseText);
-					   Ext.Msg.alert('Success', responseVars.responseText);
+					   if (responseVars.success) {
+						   Ext.Msg.alert('Success', responseVars.message);
+					   }
+					   else {
+						   Ext.Msg.alert('Failed', responseVars.message);
+					   }
+					   
 				   },
 				   failure: function(response) {
-					   responseVars = Ext.JSON.decode(response.responseText);
-					   Ext.Msg.alert('Failed', responseVars.responseText);
-					   console.log(response);
+					   Ext.Msg.alert('Failed', response.statusText);
                    }
 				});
 			}
@@ -218,20 +223,24 @@ var $app = {
 								   action: 'saveStyle'
 							   },
 							   success: function(response) {
+								   // AJAX request can success, even if the create/save operation failed
 								   responseVars = Ext.JSON.decode(response.responseText);
-								   Ext.Msg.alert(
-								       'Success',
-								       responseVars.responseText,
-            					       function(btn, txt) {
-										   opener.window.close();
-										   window.close();
-            					       }
-								   );
+								   if (responseVars.success) {
+									   Ext.Msg.alert(
+									       'Success',
+									       responseVars.message,
+	            					       function(btn, txt) {
+											   opener.window.close();
+											   window.close();
+	            					       }
+									   );
+								   }
+								   else {
+									   Ext.Msg.alert('Failed', responseVars.message);
+								   }
 							   },
 							   failure: function(response) {
-								   responseVars = Ext.JSON.decode(response.responseText);
-								   Ext.Msg.alert('Failed', responseVars.responseText);
-								   console.log(response);
+								   Ext.Msg.alert('Failed', response.statusText);
 			                   }
 							});
 						}
@@ -1119,24 +1128,48 @@ var $app = {
             					   action: 'createStyle'
             				   },
             				   success: function(form, action) {
-            					   Ext.Msg.alert(
-            					       'Success',
-            					       action.result.responseText + '<br/>' + _('Page will be reloaded. '),
-            					       function(btn, txt) {
-            					    	   createStyleWin.close();
-            					    	   $app.loadNewStyle(action.result.style_dirname);
-            					    	   
-                    					   if (closeDesigner) {
-                    						   opener.window.close();
-                    						   window.close();
-                    					   }
-            					       }
-            					   );
+								   // Form request can success, even if the create/save operation failed
+            					   if (action.result.success) {
+									   var message = action.result.message + '<br/>';
+                					   if (closeDesigner) {
+                						   message += _('Style Designer windows will be closed. ');
+                					   }
+                					   else {
+                						   message += _('Page will be reloaded. ');
+                					   }
+	            					   Ext.Msg.alert(
+	            					       'Success',
+	            					       message,
+	            					       function(btn, txt) {
+	            					    	   createStyleWin.close();
+	            					    	   $app.loadNewStyle(action.result.style_dirname);
+	            					    	   
+	                    					   if (closeDesigner) {
+	                    						   opener.window.close();
+	                    						   window.close();
+	                    					   }
+	            					       }
+	            					   );
+								   }
+								   else {
+	            					   Ext.Msg.alert(
+	            					       'Failed',
+	            					       action.result.message,
+	            					       function(btn, txt) {
+	            					    	   createStyleWin.close();
+	            					       }
+	            					   );
+								   }
+								   
             				   },
             				   failure: function(form, action) {
-                                  Ext.Msg.alert('Failed', action.result.responseText);
-           					      console.log(action);
-           					      createStyleWin.close();
+            					   Ext.Msg.alert(
+									   'Failed',
+									   action.result.message,
+									   function(btn, txt) {
+										   createStyleWin.close();
+    								   }
+    							   );
                                }
                           });
                       }
