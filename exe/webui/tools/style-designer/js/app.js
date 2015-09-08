@@ -101,6 +101,7 @@ var $app = {
 		borderColor : "DDDDDD",
 		shadowColor : "999999"
 	},
+	resources : [],
 	mark : "/* eXeLearning Style Designer */",
 	advancedMark : "/* eXeLearning Style Designer (custom CSS) */",
 	defaultMark : "/* eXeLearning Style Designer (default CSS) */",
@@ -174,6 +175,7 @@ var $app = {
 					   style_name: currentStyle,
 					   contentcss: content,
 					   navcss: nav,
+					   resources : $app.resources,
 					   action: 'saveStyle'
 				   },
 				   success: function(response) {
@@ -220,6 +222,7 @@ var $app = {
 								   style_name: currentStyle,
 								   contentcss: content,
 								   navcss: nav,
+								   resources : $app.resources,
 								   action: 'saveStyle'
 							   },
 							   success: function(response) {
@@ -311,6 +314,29 @@ var $app = {
 		}
 		*/
 		$("#"+id+"File").click();
+	},
+	openFilepicker : function(id){
+        var fp = Ext.create("opener.opener.eXe.view.filepicker.FilePicker", {
+            type: opener.opener.eXe.view.filepicker.FilePicker.modeOpen,
+            title: _("Select file."),
+            modal: true,
+            scope: this,
+            callback: function(fp) {
+                if (fp.status == opener.opener.eXe.view.filepicker.FilePicker.returnOk || fp.status == opener.opener.eXe.view.filepicker.FilePicker.returnReplace) {
+                	var filename_field = document.getElementById(id);
+                	var filepath = fp.file.path;
+                	var filename = filepath.split('\\').pop().split('/').pop();
+                	
+                	filename_field.value = filename;
+                	$app.resources.push(filepath);
+                }
+            }
+        });
+        fp.appendFilters([
+           { "typename": _("Image Files"), "extension": "*.png", "regex": /.*\.(jpg|jpeg|png|gif|svg)$/i },
+           { "typename": _("All Files"), "extension": "*.*", "regex": /.*$/ }
+        ]);
+        fp.show();
 	},
 	setWidth : function(e){
 		var w = $("#pageWidth");
@@ -1129,6 +1155,7 @@ var $app = {
             				   params: {
             					   contentcss: content,
             					   navcss: nav,
+            					   resources : $app.resources,
             					   action: 'createStyle'
             				   },
             				   success: function(form, action) {
