@@ -9,8 +9,9 @@ body{padding:0;text-align:center}
 
 #header,#emptyHeader{border-top-width:0;border-right-width:0;border-left-width:0}
 #headerContent{overflow:hidden;white-space:nowrap;text-overflow:ellipsis;padding-right:230px;min-height:1.1em}
-#nodeDecoration{background:none;padding:0;border:none;margin:20px 0;height:auto;font-size:1.6em}
+#nodeDecoration{background:none;padding:0;border:none;margin:20px 0;height:auto;min-height:0}
 #nodeTitle{font-weight:300}
+.iDevice_wrapper{margin-top:-10px}
 
 /* Menú */
 #siteNav{width:280px;float:left;margin-right:40px;margin-bottom:40px}
@@ -45,6 +46,7 @@ body{padding:0;text-align:center}
 /* Hide/Show/Skip navigation */
 #nav-toggler{margin:0;position:absolute;top:20px;left:20px;font-size:.95em}
 #nav-toggler a,#skipNav a{padding:5px 10px;border-radius:5px}
+#nav-toggler a{display:block}
 #nav-toggler a:hover{text-decoration:none}
 #skipNav{z-index:100px;padding-top:15px;text-align:center}
 
@@ -78,6 +80,13 @@ body{padding:0;text-align:center}
 	#nav-toggler{position:relative;top:0;left:0;margin:20px 19px;text-align:center}
 	#nav-toggler a{width:100%;display:block;padding:8px 0}
 	#siteNav{border-top:1px solid}
+}
+
+@media print{
+	#siteNav,#nav-toggler,.noprt,.toggle-idevice{display:none}
+	#main{padding:20px 0}
+	body #content{background:#FFF}
+	#headerContent{white-space:normal;text-overflow:normal;padding-right:0;font-weight:bold}
 }
 
 /* eXeLearning Style Designer */
