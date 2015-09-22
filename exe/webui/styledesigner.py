@@ -134,7 +134,7 @@ class StyleDesigner(Renderable, Resource):
         
         return json.dumps(response)
     
-    def updateStyle(self, styleDir, contentcss, navcss, style_config, resources):
+    def updateStyle(self, styleDir, contentcss, navcss, style_config):
         """
         Overwrite content.css, nav.css and config.xml files with the data given
         """
@@ -162,11 +162,6 @@ class StyleDesigner(Renderable, Resource):
         configxml_file = open(styleDir / 'config.xml', 'w')
         configxml_file.write(configxml_pretty)
         configxml_file.close()
-        
-        for file_path in resources :
-            if (os.path.isfile(file_path)) :
-                shutil.copy(file_path, styleDir)
-                
     
     def createStyle(self, style_dirname, style_data):
         """
@@ -203,10 +198,7 @@ class StyleDesigner(Renderable, Resource):
                     'license-url': 'http://creativecommons.org/licenses/by-sa/3.0/',
                     'description': '',
                 }
-                resources = []
-                if 'resources' in style_data.keys() :
-                    resources = style_data['resources']
-                self.updateStyle(styleDir, contentcss, navcss, configxml, resources)
+                self.updateStyle(styleDir, contentcss, navcss, configxml)
                 
                 # New style dir has been created, add style to eXe Styles store
                 style = Style(styleDir)
@@ -247,10 +239,7 @@ class StyleDesigner(Renderable, Resource):
                     'license-url': 'http://creativecommons.org/licenses/by-sa/3.0/',
                     'description': '',
                 }
-                resources = []
-                if 'resources' in style_data.keys() :
-                    resources = style_data['resources']
-                self.updateStyle(styleDir, contentcss, navcss, configxml, resources)
+                self.updateStyle(styleDir, contentcss, navcss, configxml)
                 
                 style = Style(styleDir)
                 return style
