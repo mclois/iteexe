@@ -182,6 +182,9 @@ class StyleDesigner(Renderable, Resource):
                     full_file_name = os.path.join(baseStyleDir, file_name)
                     if (os.path.isfile(full_file_name)):
                         shutil.copy(full_file_name, styleDir)
+                        
+                # Save all uploaded files to style dir
+                self.saveUploadedFiles(styleDir, style_data)
                 
                 
                 # Overwrite content.css, nav.css and config.xml files with the data
@@ -224,7 +227,10 @@ class StyleDesigner(Renderable, Resource):
         if not os.path.isdir(styleDir):
             raise StyleDesignerError(_('Error saving style, style directory does not exist'))
         else:
-            try:
+            try:        
+                # Save all uploaded files to style dir
+                self.saveUploadedFiles(styleDir, style_data)
+                
                 # Overwrite content.css, nav.css and config.xml files with the data
                 # from the style designer
                 contentcss = style_data['contentcss'][0]
@@ -247,5 +253,23 @@ class StyleDesigner(Renderable, Resource):
             except Exception, e:
                 raise StyleDesignerError(str(e))
             
+    def saveUploadedFiles(self, targetDir, uploaded):
+        """
+        Saves to a given directory the uploaded files
+        """
         
+        if 'bodyBGURLFile_0' in uploaded :
+            out = open(targetDir / uploaded['bodyBGURLFilename_0'][0], 'w')
+            out.write(uploaded['bodyBGURLFile_0'][0])
+            out.close()
+        
+        if 'contentBGURLFile_0' in uploaded :
+            out = open(targetDir / uploaded['contentBGURLFilename_0'][0], 'w')
+            out.write(uploaded['contentBGURLFile_0'][0])
+            out.close()
+        
+        if 'headerBGURLFile_0' in uploaded :
+            out = open(targetDir / uploaded['headerBGURLFilename_0'][0], 'w')
+            out.write(uploaded['headerBGURLFile_0'][0])
+            out.close()
         
