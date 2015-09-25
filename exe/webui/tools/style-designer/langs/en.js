@@ -26,6 +26,13 @@ var $i18n = {
 	Text_size : _("Size"),
 	Links_color : _("Links"),
 	Links_color_FULL : _("Links color"),
+	// Description
+	Style_Description : _("Style description"),
+	Style_Description_Instructions : _("Tell something about the Style..."),
+	Author : _("Author"),
+	Author_URL : _("Author URL"),
+	License : _("License"),
+	Original_License : _("(license of the original Style)"),
 	// #2
 	Page : _("Page"),
 	Page_background : _("Page background (only Web Site)"),

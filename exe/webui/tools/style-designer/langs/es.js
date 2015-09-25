@@ -20,6 +20,13 @@ var $i18n = {
 	Text_size : "Tamaño",
 	Links_color : "Enlaces",
 	Links_color_FULL : "Color enlaces",
+	// Description
+	Style_Description : "Descripción del Estilo",
+	Style_Description_Instructions : "Cuenta algo sobre el Estilo...",
+	Author : "Autor",
+	Author_URL : "Web del autor",
+	License : "Licencia",
+	Original_License : "(la licencia del Estilo original)",	
 	// #2
 	Page : "Página",
 	Page_background : "Fondo de página (solo sitio web)", // Fondo de p&aacute;gina (solo sitio web)

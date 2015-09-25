@@ -91,7 +91,7 @@ var $appVars = [
 ];
 
 var $app = {
-	debug : "on", // off/on
+	debug : "off", // off/on
 	returnFullContent : true,
 	defaultValues : {
 		headerHeight : 120,
