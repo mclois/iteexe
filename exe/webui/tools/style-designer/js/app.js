@@ -151,7 +151,7 @@ var $app = {
 			$app.getPreview();
 			var content = $("#my-content-css").val();
 			var nav = $("#my-nav-css").val();
-			$app.createStyle(content, nav);
+			$app.createStyle(content, nav, $app.getCurrentStyle());
 		});
 
 		$("#save").click(function(){
@@ -162,7 +162,7 @@ var $app = {
 			
 			if (currentStyle == 'base') {
 				// If user is editing base style it must be because style has not been saved yet,
-				// open dialog to create a new one
+				// open dialog to create a new one from base style
 				$app.createStyle(content, nav);
 			}
 			else  {
@@ -208,7 +208,7 @@ var $app = {
 						if (currentStyle == 'base') {
 							// If user is editing base style it must be because style has not been saved yet,
 							// open dialog to create a new one instead
-							$app.createStyle(content, nav, true);
+							$app.createStyle(content, nav, 'base', true);
 						}
 						else  {
 							// Send POST request to update current style
@@ -1090,30 +1090,39 @@ var $app = {
 		// Menu height
 		if (typeof(w.myTheme.setNavHeight)!='undefined') w.myTheme.setNavHeight();
 	},
-	collectAjaxData : function(content, nav, style_name, op) {
-	   var data = new FormData();
-	   
-	   data.append('contentcss', content);
-	   data.append('navcss', nav);
-	   data.append('style_name', style_name);
-	   data.append('action', op);
-	   jQuery.each(jQuery('#bodyBGURLFile')[0].files, function(i, file) {
-		   data.append('bodyBGURLFile_'+i, file);
-		   data.append('bodyBGURLFilename_'+i, file.name);
-	   });
-	   jQuery.each(jQuery('#contentBGURLFile')[0].files, function(i, file) {
-		   data.append('contentBGURLFile_'+i, file);
-		   data.append('contentBGURLFilename_'+i, file.name);
-	   });
-	   jQuery.each(jQuery('#headerBGURLFile')[0].files, function(i, file) {
-		   data.append('headerBGURLFile_'+i, file);
-		   data.append('headerBGURLFilename_'+i, file.name);
-	   });
-	   
-	   return data;
+	collectAjaxData : function(content, nav, style_name, op, copyFrom) {
+		if (copyFrom == undefined) {
+			copyFrom = 'base';
+		}
+		var data = new FormData();
+		
+		data.append('contentcss', content);
+		data.append('navcss', nav);
+		data.append('style_name', style_name);
+		data.append('action', op);
+		jQuery.each(jQuery('#bodyBGURLFile')[0].files, function(i, file) {
+			data.append('bodyBGURLFile_'+i, file);
+			data.append('bodyBGURLFilename_'+i, file.name);
+		});
+		jQuery.each(jQuery('#contentBGURLFile')[0].files, function(i, file) {
+			data.append('contentBGURLFile_'+i, file);
+			data.append('contentBGURLFilename_'+i, file.name);
+		});
+		jQuery.each(jQuery('#headerBGURLFile')[0].files, function(i, file) {
+			data.append('headerBGURLFile_'+i, file);
+			data.append('headerBGURLFilename_'+i, file.name);
+		});
+		if (op == 'createStyle') {
+			data.append('copy_from', copyFrom);
+		}
+   
+   return data;
 	},
-	createStyle : function(content, nav, closeDesigner){
+	createStyle : function(content, nav, copyFrom, closeDesigner){
 //		opener.opener.eXe.app.getController('Toolbar').styleDesigner.saveStyle(content,nav);
+		if (copyFrom == undefined) {
+			copyFrom = 'base';
+		}
 		if (closeDesigner == undefined) {
 			closeDesigner = false;
 		}
@@ -1146,7 +1155,7 @@ var $app = {
             		   var form = this.up('form').getForm(); // get the form panel
             		   if (form.isValid()) { // make sure the form contains valid data before submitting
             			   var style_name = form.findField('style_name');
-            			   var data = $app.collectAjaxData(content, nav, style_name.getValue(), 'createStyle');
+            			   var data = $app.collectAjaxData(content, nav, style_name.getValue(), 'createStyle', copyFrom);
 
             			   jQuery.ajax({
 								url: '/styleDesigner',

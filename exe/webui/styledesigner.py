@@ -168,6 +168,10 @@ class StyleDesigner(Renderable, Resource):
         Creates a new style with the name and data given
         """
         # Check that the target dir does not already exists and create
+        copy_from = 'base'
+        if 'copy_from' in style_data :
+            copy_from = style_data['copy_from'];
+            
         styleDir = self.config.stylesDir / style_dirname
         if os.path.isdir(styleDir):
             raise CreateStyleExistsError(styleDir, _('Style %s directory already exists') % (style_dirname))
@@ -176,7 +180,7 @@ class StyleDesigner(Renderable, Resource):
                 os.mkdir(styleDir)
                 
                 # Copy ALL files from the base style
-                baseStyleDir = self.config.stylesDir / 'base'
+                baseStyleDir = self.config.stylesDir / copy_from
                 base_files = os.listdir(baseStyleDir)
                 for file_name in base_files:
                     full_file_name = os.path.join(baseStyleDir, file_name)
