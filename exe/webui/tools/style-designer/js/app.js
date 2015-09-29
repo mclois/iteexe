@@ -181,6 +181,7 @@ var $app = {
 						result = JSON.parse(response);
 						if (result.success) {
 							Ext.Msg.alert('Success', result.message);
+							opener.window.location.reload();
 						}
 						else {
 							Ext.Msg.alert('Failed', result.message);
@@ -332,6 +333,7 @@ var $app = {
 		}
 		$app.myContentCSS = $app.removeStylePath(myContentCSS);
 		$app.getAllValues("content",$app.myContentCSS);
+		$app.loadConfig();
 		
 		// nav.css
 		var navCSS = opener.$designer.navCSS.split($app.mark);
@@ -356,6 +358,23 @@ var $app = {
 	removeStylePath : function(c){
 		var reg = new RegExp($app.stylePath, "g");
 		return c.replace(reg, "");
+	},
+	loadConfig : function() {
+		jQuery('#authorName').val(opener.$designer.config.authorName);
+		jQuery('#authorURL').val(opener.$designer.config.authorURL);
+		jQuery('#styleDescription').val(opener.$designer.config.styleDescription);
+		
+		// If current styleVersion is not available in the default option list,
+		// append it to available options before setting value
+		if (   opener.$designer.config.styleVersionMinor != 0
+			|| opener.$designer.config.styleVersionMajor > 20
+			|| opener.$designer.config.styleVersionMajor < 1) {
+			$('#styleVersion').append($('<option>', {
+			    value: opener.$designer.config.styleVersion,
+			    text: opener.$designer.config.styleVersion
+			}));
+		}
+		jQuery('#styleVersion').val(opener.$designer.config.styleVersion);
 	},
 	getAllValues : function(type,content){
 		
@@ -1100,6 +1119,8 @@ var $app = {
 		data.append('navcss', nav);
 		data.append('style_name', style_name);
 		data.append('action', op);
+		
+		// Get files uploaded to the editor form
 		jQuery.each(jQuery('#bodyBGURLFile')[0].files, function(i, file) {
 			data.append('bodyBGURLFile_'+i, file);
 			data.append('bodyBGURLFilename_'+i, file.name);
@@ -1115,8 +1136,14 @@ var $app = {
 		if (op == 'createStyle') {
 			data.append('copy_from', copyFrom);
 		}
-   
-   return data;
+		
+		// Get style name, author and description
+		data.append('author', jQuery('#authorName').val());
+		data.append('author_url', jQuery('#authorURL').val());
+		data.append('description', jQuery('#styleDescription').val());
+		data.append('version', jQuery('#styleVersion').val());
+		
+		return data;
 	},
 	createStyle : function(content, nav, copyFrom, closeDesigner){
 //		opener.opener.eXe.app.getController('Toolbar').styleDesigner.saveStyle(content,nav);

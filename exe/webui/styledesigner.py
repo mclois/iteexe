@@ -170,7 +170,7 @@ class StyleDesigner(Renderable, Resource):
         # Check that the target dir does not already exists and create
         copy_from = 'base'
         if 'copy_from' in style_data :
-            copy_from = style_data['copy_from'];
+            copy_from = style_data['copy_from'][0];
             
         styleDir = self.config.stylesDir / style_dirname
         if os.path.isdir(styleDir):
@@ -195,15 +195,24 @@ class StyleDesigner(Renderable, Resource):
                 # from the style designer
                 contentcss = style_data['contentcss'][0]
                 navcss = style_data['navcss'][0]
+                author = 'exeLearning.net'
+                if 'author' in style_data :
+                    author = style_data['author']
+                author_url = 'http://exelearning.net'
+                if 'author_url' in style_data :
+                    author_url = style_data['author_url']
+                description = ''
+                if 'description' in style_data :
+                    description = style_data['description']
                 configxml = {
                     'name':  style_data['style_name'][0],
                     'version': '1.0',
                     'compatibility': version.version,
-                    'author': 'eXeLearning.net',
-                    'author-url': 'http://exelearning.net',
+                    'author': author,
+                    'author-url': author_url,
                     'license': 'Creative Commons by-sa',
                     'license-url': 'http://creativecommons.org/licenses/by-sa/3.0/',
-                    'description': '',
+                    'description': description,
                 }
                 self.updateStyle(styleDir, contentcss, navcss, configxml)
                 
@@ -231,7 +240,9 @@ class StyleDesigner(Renderable, Resource):
         if not os.path.isdir(styleDir):
             raise StyleDesignerError(_('Error saving style, style directory does not exist'))
         else:
-            try:        
+            try:
+                style = Style(styleDir)
+                
                 # Save all uploaded files to style dir
                 self.saveUploadedFiles(styleDir, style_data)
                 
@@ -239,19 +250,42 @@ class StyleDesigner(Renderable, Resource):
                 # from the style designer
                 contentcss = style_data['contentcss'][0]
                 navcss = style_data['navcss'][0]
+                
+                author = 'exeLearning.net'
+                if 'author' in style_data :
+                    author = style_data['author'][0]
+                    
+                author_url = 'http://exelearning.net'
+                if 'author_url' in style_data :
+                    author_url = style_data['author_url'][0]
+                    
+                description = ''
+                if 'description' in style_data :
+                    description = style_data['description'][0]
+                    
+                new_version = style.get_version()
+                if 'version' in style_data :
+                    new_version = style_data['version'][0];
+                # If user has chosen a new version, use it
+                # otherwise autoincrement minor version
+                if new_version != style.get_version() :
+                    next_version = new_version
+                else :
+                    current_version = tuple(map(int, style.get_version().split('.')));
+                    next_version = (current_version[0], current_version[1] + 1);
+                    next_version = '.'.join(map(str, next_version))
+                    
                 configxml = {
                     'name':  style_data['style_name'][0],
-                    'version': '1.0',
+                    'version': next_version,
                     'compatibility': version.version,
-                    'author': 'eXeLearning.net',
-                    'author-url': 'http://exelearning.net',
+                    'author': author,
+                    'author-url': author_url,
                     'license': 'Creative Commons by-sa',
                     'license-url': 'http://creativecommons.org/licenses/by-sa/3.0/',
-                    'description': '',
+                    'description': description,
                 }
                 self.updateStyle(styleDir, contentcss, navcss, configxml)
-                
-                style = Style(styleDir)
                 return style
                 
             except Exception, e:
