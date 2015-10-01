@@ -167,7 +167,7 @@ var $app = {
 			}
 			else  {
 				// Send POST request to update current style
- 			   var data = $app.collectAjaxData(content, nav, currentStyle, 'saveStyle');
+ 			   var data = $app.collectAjaxData(content, nav, opener.$designer.config.styleName, 'saveStyle');
  			   
  			   jQuery.ajax({
 					url: '/styleDesigner',
@@ -360,6 +360,7 @@ var $app = {
 		return c.replace(reg, "");
 	},
 	loadConfig : function() {
+		jQuery('#styleName').val(opener.$designer.config.styleName);
 		jQuery('#authorName').val(opener.$designer.config.authorName);
 		jQuery('#authorURL').val(opener.$designer.config.authorURL);
 		jQuery('#styleDescription').val(opener.$designer.config.styleDescription);
@@ -1118,6 +1119,10 @@ var $app = {
 		data.append('contentcss', content);
 		data.append('navcss', nav);
 		data.append('style_name', style_name);
+		if (op == 'saveStyle') {
+			// Style has already been created, send the current Style Id as its directory name
+			data.append('style_dirname', $app.getCurrentStyle());
+		}
 		data.append('action', op);
 		
 		// Get files uploaded to the editor form

@@ -31,8 +31,9 @@ var $i18n = {
 	Style_Description_Instructions : _("Tell something about the Style..."),
 	Author : _("Author"),
 	Author_URL : _("Author URL"),
+	Style_Name : _("Style name"),
 	Style_Version : _("Style version"),
-	Style_Version_Instructions : _("Version number is updated automatically every time you save. Use this selector to reset the version number to one of your chosing."),
+	Style_Version_Instructions : _("Style version number is automatically increased when you save, use this selector to reset it."),
 	License : _("License"),
 	Original_License : _("(license of the original Style)"),
 	// #2

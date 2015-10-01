@@ -25,9 +25,9 @@ var $i18n = {
 	Style_Description_Instructions : "Cuenta algo sobre el Estilo...",
 	Author : "Autor",
 	Author_URL : "Web del autor",
-	Style_Version : _("Versión del estilo"),
-	Style_Version_Instructions : _("Version number is updated automatically every time you save. Use this selector to reset the version number to one of your chosing."),
-	Style_Version_Instructions : _("El número de versión se actualiza automáticamente cada vez que guardas. Utiliza este desplegable para volver a un número de versión de tu elección."),
+	Style_Name : "Nombre del estilo",
+	Style_Version : "Versión del estilo",
+	Style_Version_Instructions : "El número de versión se incrementa automáticamente cada vez que guardas, utiliza este desplegable para resetearlo.",
 	License : "Licencia",
 	Original_License : "(la licencia del Estilo original)",	
 	// #2

@@ -27,6 +27,7 @@ import os
 import shutil
 import json
 import unicodedata
+import cgi
 try:
     import xml.etree.cElementTree as ET
 except ImportError:
@@ -113,15 +114,16 @@ class StyleDesigner(Renderable, Resource):
             response = {}
                 
             if action == 'createStyle':
+                # Get style directory (which is also the style ID) from the style name
                 style_dirname = self.styleIdFromName(request.args['style_name'][0])
-            
                 style = self.createStyle(style_dirname, request.args)
                 response['style_dirname'] = style.get_dirname()
                 response['success'] = True
                 response['message'] = _('Style %s successfully created!') % (style.get_name())
                 
             if action == 'saveStyle':
-                style_dirname = request.args['style_name'][0]
+                # Style directory must has been explicitly set
+                style_dirname = request.args['style_dirname'][0]
                 style = self.saveStyle(style_dirname, request.args)
                 response['style_dirname'] = style.get_dirname()
                 response['success'] = True
@@ -190,20 +192,23 @@ class StyleDesigner(Renderable, Resource):
                 # Save all uploaded files to style dir
                 self.saveUploadedFiles(styleDir, style_data)
                 
-                
                 # Overwrite content.css, nav.css and config.xml files with the data
                 # from the style designer
                 contentcss = style_data['contentcss'][0]
                 navcss = style_data['navcss'][0]
+                
                 author = 'exeLearning.net'
                 if 'author' in style_data :
-                    author = style_data['author']
+                    author = cgi.escape(style_data['author'][0], True)
+                    
                 author_url = 'http://exelearning.net'
                 if 'author_url' in style_data :
-                    author_url = style_data['author_url']
+                    author_url = cgi.escape(style_data['author_url'][0], True)
+                    
                 description = ''
                 if 'description' in style_data :
-                    description = style_data['description']
+                    description = cgi.escape(style_data['description'][0], True)
+                    
                 configxml = {
                     'name':  style_data['style_name'][0],
                     'version': '1.0',
@@ -253,15 +258,15 @@ class StyleDesigner(Renderable, Resource):
                 
                 author = 'exeLearning.net'
                 if 'author' in style_data :
-                    author = style_data['author'][0]
+                    author = cgi.escape(style_data['author'][0], True)
                     
                 author_url = 'http://exelearning.net'
                 if 'author_url' in style_data :
-                    author_url = style_data['author_url'][0]
+                    author_url = cgi.escape(style_data['author_url'][0], True)
                     
                 description = ''
                 if 'description' in style_data :
-                    description = style_data['description'][0]
+                    description = cgi.escape(style_data['description'][0], True)
                     
                 new_version = style.get_version()
                 if 'version' in style_data :
