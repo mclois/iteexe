@@ -348,6 +348,7 @@ var $app = {
 		
 	},
 	addStylePath : function(c){
+		c = $app.removeStylePath(c);
 		c = c.replace(/url\(http:/g,'url--http:');
 		c = c.replace(/url\(https:/g,'url--https:');
 		c = c.replace(/url\(/g,'url('+$app.stylePath);
@@ -1095,6 +1096,7 @@ var $app = {
 		var css = this.composeCSS();
 		var contentCSS = css[0];
 		contentCSS = $app.baseContentCSS+$app.advancedMark+contentCSS;
+		contentCSS = $app.addStylePath(contentCSS);
 		this.setCSS(contentCSSTag,$app.baseContentCSS+contentCSS);
 		
 		// content.css and nav.css TEXTAREAS
@@ -1108,6 +1110,7 @@ var $app = {
 		var navCSS = css[1];
 		// advancedMark
 		navCSS = $app.baseNavCSS+$app.advancedMark+navCSS;
+		navCSS = $app.addStylePath(navCSS);
 		this.setCSS(navCSSTag,navCSS);
 		
 		// Menu height
