@@ -27,6 +27,7 @@ import os
 import shutil
 import json
 import unicodedata
+import cgi
 try:
     import xml.etree.cElementTree as ET
 except ImportError:
@@ -113,15 +114,16 @@ class StyleDesigner(Renderable, Resource):
             response = {}
                 
             if action == 'createStyle':
+                # Get style directory (which is also the style ID) from the style name
                 style_dirname = self.styleIdFromName(request.args['style_name'][0])
-            
                 style = self.createStyle(style_dirname, request.args)
                 response['style_dirname'] = style.get_dirname()
                 response['success'] = True
                 response['message'] = _('Style %s successfully created!') % (style.get_name())
                 
             if action == 'saveStyle':
-                style_dirname = request.args['style_name'][0]
+                # Style directory must has been explicitly set
+                style_dirname = request.args['style_dirname'][0]
                 style = self.saveStyle(style_dirname, request.args)
                 response['style_dirname'] = style.get_dirname()
                 response['success'] = True
@@ -168,6 +170,10 @@ class StyleDesigner(Renderable, Resource):
         Creates a new style with the name and data given
         """
         # Check that the target dir does not already exists and create
+        copy_from = 'base'
+        if 'copy_from' in style_data :
+            copy_from = style_data['copy_from'][0];
+            
         styleDir = self.config.stylesDir / style_dirname
         if os.path.isdir(styleDir):
             raise CreateStyleExistsError(styleDir, _('Style %s directory already exists') % (style_dirname))
@@ -176,7 +182,7 @@ class StyleDesigner(Renderable, Resource):
                 os.mkdir(styleDir)
                 
                 # Copy ALL files from the base style
-                baseStyleDir = self.config.stylesDir / 'base'
+                baseStyleDir = self.config.stylesDir / copy_from
                 base_files = os.listdir(baseStyleDir)
                 for file_name in base_files:
                     full_file_name = os.path.join(baseStyleDir, file_name)
@@ -186,20 +192,32 @@ class StyleDesigner(Renderable, Resource):
                 # Save all uploaded files to style dir
                 self.saveUploadedFiles(styleDir, style_data)
                 
-                
                 # Overwrite content.css, nav.css and config.xml files with the data
                 # from the style designer
                 contentcss = style_data['contentcss'][0]
                 navcss = style_data['navcss'][0]
+                
+                author = 'exeLearning.net'
+                if 'author' in style_data :
+                    author = cgi.escape(style_data['author'][0], True)
+                    
+                author_url = 'http://exelearning.net'
+                if 'author_url' in style_data :
+                    author_url = cgi.escape(style_data['author_url'][0], True)
+                    
+                description = ''
+                if 'description' in style_data :
+                    description = cgi.escape(style_data['description'][0], True)
+                    
                 configxml = {
                     'name':  style_data['style_name'][0],
                     'version': '1.0',
                     'compatibility': version.version,
-                    'author': 'eXeLearning.net',
-                    'author-url': 'http://exelearning.net',
+                    'author': author,
+                    'author-url': author_url,
                     'license': 'Creative Commons by-sa',
                     'license-url': 'http://creativecommons.org/licenses/by-sa/3.0/',
-                    'description': '',
+                    'description': description,
                 }
                 self.updateStyle(styleDir, contentcss, navcss, configxml)
                 
@@ -227,7 +245,9 @@ class StyleDesigner(Renderable, Resource):
         if not os.path.isdir(styleDir):
             raise StyleDesignerError(_('Error saving style, style directory does not exist'))
         else:
-            try:        
+            try:
+                style = Style(styleDir)
+                
                 # Save all uploaded files to style dir
                 self.saveUploadedFiles(styleDir, style_data)
                 
@@ -235,19 +255,42 @@ class StyleDesigner(Renderable, Resource):
                 # from the style designer
                 contentcss = style_data['contentcss'][0]
                 navcss = style_data['navcss'][0]
+                
+                author = 'exeLearning.net'
+                if 'author' in style_data :
+                    author = cgi.escape(style_data['author'][0], True)
+                    
+                author_url = 'http://exelearning.net'
+                if 'author_url' in style_data :
+                    author_url = cgi.escape(style_data['author_url'][0], True)
+                    
+                description = ''
+                if 'description' in style_data :
+                    description = cgi.escape(style_data['description'][0], True)
+                    
+                new_version = style.get_version()
+                if 'version' in style_data :
+                    new_version = style_data['version'][0];
+                # If user has chosen a new version, use it
+                # otherwise autoincrement minor version
+                if new_version != style.get_version() :
+                    next_version = new_version
+                else :
+                    current_version = tuple(map(int, style.get_version().split('.')));
+                    next_version = (current_version[0], current_version[1] + 1);
+                    next_version = '.'.join(map(str, next_version))
+                    
                 configxml = {
                     'name':  style_data['style_name'][0],
-                    'version': '1.0',
+                    'version': next_version,
                     'compatibility': version.version,
-                    'author': 'eXeLearning.net',
-                    'author-url': 'http://exelearning.net',
+                    'author': author,
+                    'author-url': author_url,
                     'license': 'Creative Commons by-sa',
                     'license-url': 'http://creativecommons.org/licenses/by-sa/3.0/',
-                    'description': '',
+                    'description': description,
                 }
                 self.updateStyle(styleDir, contentcss, navcss, configxml)
-                
-                style = Style(styleDir)
                 return style
                 
             except Exception, e:

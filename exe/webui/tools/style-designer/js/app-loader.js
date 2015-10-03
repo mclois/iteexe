@@ -25,6 +25,7 @@ var $designer = {
 			}
 		}
 		this.language = lang;
+		this.getConfig();
 	},
 	getUrlVars : function(url) {
 		// Read a page's GET URL variables and return them as an associative array.
@@ -55,8 +56,7 @@ var $designer = {
 	},	
 	getStylesContent : function(type){
 		var url = "/style/"+this.styleId+"/"+type+".css";
-		var tag = document.getElementById("my-"+type+"-css");
-		$.ajax({
+		var tag = document.getElementById("my-"+type+"-css");$.ajax({
 			type: "GET",
 			url: url,
 			success: function(res){
@@ -67,6 +67,52 @@ var $designer = {
 				else $designer.navCSS = res;
 			}
 		});
+	},
+	getConfig : function(){
+		if (this.styleId == 'base') {
+			// Use default name, author and description: 'base' style has some custom
+			// values in author and description, not really suitable as starting template
+			styleConfig = {};
+			
+			styleConfig.styleName = '';
+			
+			styleConfig.authorName = 'eXeLearning.net';
+			styleConfig.authorURL = 'http://exelearning.net';
+			
+			styleConfig.styleDescription = '';
+			
+			styleConfig.styleVersion = '1.0';
+			var version = styleConfig.styleVersion.split('.');
+			styleConfig.styleVersionMajor = version[0];
+			styleConfig.styleVersionMinor = version[1];
+			
+			$designer.config = styleConfig;
+		}
+		else {
+			// Load from config.xml 
+			var url = "/style/"+this.styleId+"/config.xml";
+			$.ajax({
+				type: "GET",
+				url: url,
+				success: function(config){
+					var styleConfig = {};
+	
+					styleConfig.styleName = config.evaluate('/theme[1]/name[1]', config, null, XPathResult.STRING_TYPE, null).stringValue;
+					
+					styleConfig.authorName = config.evaluate('/theme[1]/author[1]', config, null, XPathResult.STRING_TYPE, null).stringValue;
+					styleConfig.authorURL = config.evaluate('/theme[1]/author-url[1]', config, null, XPathResult.STRING_TYPE, null).stringValue;
+					
+					styleConfig.styleDescription = config.evaluate('/theme[1]/description[1]', config, null, XPathResult.STRING_TYPE, null).stringValue;
+					
+					styleConfig.styleVersion = config.evaluate('/theme[1]/version[1]', config, null, XPathResult.STRING_TYPE, null).stringValue;
+					var version = styleConfig.styleVersion.split('.');
+					styleConfig.styleVersionMajor = version[0];
+					styleConfig.styleVersionMinor = version[1];
+					
+					$designer.config = styleConfig;
+				}
+			});
+		}
 	},
 	printStyles : function(type){
 		// Is it IE<9?
