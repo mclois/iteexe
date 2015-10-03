@@ -28,10 +28,10 @@ var $i18n = {
 	Links_color_FULL : _("Links color"),
 	// Description
 	Style_Description : _("Style description"),
-	Style_Description_Instructions : _("Tell something about the Style..."),
 	Author : _("Author"),
 	Author_URL : _("Author URL"),
 	Style_Name : _("Style name"),
+	Save_to_name : _("Save to name the new Style."),
 	Style_Version : _("Style version"),
 	Style_Version_Instructions : _("Style version number is automatically increased when you save, use this selector to reset it."),
 	License : _("License"),

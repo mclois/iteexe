@@ -22,10 +22,10 @@ var $i18n = {
 	Links_color_FULL : "Color enlaces",
 	// Description
 	Style_Description : "Descripción del Estilo",
-	Style_Description_Instructions : "Cuenta algo sobre el Estilo...",
 	Author : "Autor",
 	Author_URL : "Web del autor",
 	Style_Name : "Nombre del estilo",
+	Save_to_name : _("Guarda los cambios para darle un nombre al Estilo."),
 	Style_Version : "Versión del estilo",
 	Style_Version_Instructions : "El número de versión se incrementa automáticamente cada vez que guardas, utiliza este desplegable para resetearlo.",
 	License : "Licencia",

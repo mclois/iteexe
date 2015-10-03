@@ -361,6 +361,9 @@ var $app = {
 	},
 	loadConfig : function() {
 		jQuery('#styleName').val(opener.$designer.config.styleName);
+		// Hide the name field if it's a new Style
+		if ($("#styleName").val()=="") $("#currentStyleInfo").hide().before($i18n.Save_to_name);		
+		
 		jQuery('#authorName').val(opener.$designer.config.authorName);
 		jQuery('#authorURL').val(opener.$designer.config.authorURL);
 		jQuery('#styleDescription').val(opener.$designer.config.styleDescription);
