@@ -298,7 +298,11 @@ var $app = {
 		// opener.parent.opener.document.getElementsByTagName("IFRAME")[0].contentWindow;
 		// opener.parent.opener.window.nevow_clientToServerEvent('quit', '', '');
 		var id = e.id.replace("File","");
+		// Show file name in the file input
 		$("#"+id).val($(e).val());
+		// Save temporary file URL in hidden input
+		$("#"+id+'TempURL').val(window.URL.createObjectURL(e.files[0]).toString());
+		
 		$app.getPreview();
 	},
 	openBrowser : function(id){
@@ -354,7 +358,32 @@ var $app = {
 		c = c.replace(/url\(/g,'url('+$app.stylePath);
 		c = c.replace(/url--http:/g,'url(http:');
 		c = c.replace(/url--https:/g,'url(https:');
+		
+		// Replace relative paths to background images with its temporary URLs
+		// (required when file is changed but not yet saved)
+		var bodyBGURL_tempURL = $('#bodyBGURLTempURL').val();
+		if (bodyBGURL_tempURL){
+			var bodyBGURL_filename = $('#bodyBGURL').val();
+			c = $app.replaceBackgroundImage(c, bodyBGURL_filename, bodyBGURL_tempURL);
+		}
+		var bodyBGURL_tempURL = $('#contentBGURLTempURL').val();
+		if (bodyBGURL_tempURL){
+			var bodyBGURL_filename = $('#contentBGURL').val();
+			c = $app.replaceBackgroundImage(c, bodyBGURL_filename, bodyBGURL_tempURL);
+		}
+		var bodyBGURL_tempURL = $('#headerBGURLTempURL').val();
+		if (bodyBGURL_tempURL){
+			var bodyBGURL_filename = $('#headerBGURL').val();
+			c = $app.replaceBackgroundImage(c, bodyBGURL_filename, bodyBGURL_tempURL);
+		}
+		
 		return c;
+	},
+	replaceBackgroundImage : function(content, filename, fullURL) {
+		var relativePath = 'background-image:url(' + $app.stylePath + filename + ')';
+		var replacement = 'background-image:url(' + fullURL + ')';
+		
+		return content.replace(relativePath, replacement);
 	},
 	removeStylePath : function(c){
 		var reg = new RegExp($app.stylePath, "g");
