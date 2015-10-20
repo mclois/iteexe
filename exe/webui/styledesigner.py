@@ -132,7 +132,7 @@ class StyleDesigner(Renderable, Resource):
         except Exception, e:
                 # Operation has failed, but we can inform the user about the error
                 response['success'] = False
-                response['message'] = str(e)
+                response['message'] = e.message
         
         return json.dumps(response)
     
@@ -176,7 +176,7 @@ class StyleDesigner(Renderable, Resource):
             
         styleDir = self.config.stylesDir / style_dirname
         if os.path.isdir(styleDir):
-            raise CreateStyleExistsError(styleDir, _('Style %s directory already exists') % (style_dirname))
+            raise CreateStyleExistsError(styleDir, _(u'Style %s directory already exists') % (style_dirname))
         else:
             try:
                 os.mkdir(styleDir)
@@ -233,7 +233,7 @@ class StyleDesigner(Renderable, Resource):
             except Exception, e:
                 if os.path.isdir(styleDir):
                     styleDir.rmtree()
-                raise CreateStyleError(str(e))
+                raise CreateStyleError(e.message)
     
     def saveStyle(self, style_dirname, style_data):
         """
@@ -294,7 +294,7 @@ class StyleDesigner(Renderable, Resource):
                 return style
                 
             except Exception, e:
-                raise StyleDesignerError(str(e))
+                raise StyleDesignerError(e.message)
             
     def saveUploadedFiles(self, targetDir, uploaded):
         """
