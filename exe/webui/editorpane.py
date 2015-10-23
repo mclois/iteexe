@@ -357,8 +357,7 @@ data is entered into this field."""))
                 icon = self.idevice.icon
                 if icon != "":
                     html += '<img align="middle" '
-                    html += 'src="/style/%s/icon_%s' % (self.style.get_dirname(), icon)
-                    html += '.gif"/><br/>'
+                    html += 'src="/style/%s/icon_%s"/><br/>' % (self.style.get_dirname(), icon)
                 html += u'<div id="iconpanel" style="display:none; z-index:99;">'
                 html += u'<div style="float:right;" >\n'
                 html += u'<img alt="%s" ' % _("Close")
@@ -421,14 +420,14 @@ data is entered into this field."""))
         iconfiles = iconpath.files("icon_*")
         html = ""
         for iconfile in iconfiles:
-            iconname = iconfile.namebase
+            iconname = iconfile.basename()
             icon     = iconname.split("_", 1)[1]
-            filename = "/style/%s/%s.gif" % (self.style.get_dirname(), iconname)
+            filename = "/style/%s/%s" % (self.style.get_dirname(), iconname)
             html += u'<div style="float:left; text-align:center; width:80px;\n'
             html += u'margin-right:10px; margin-bottom:10px" > '
             html += u'<img src="%s" \n' % filename
             html += u' alt="%s" ' % _("Submit")
             html += u"onclick=\"submitLink('selectIcon','%s',1)\">\n" % icon
-            html += u'<br/>%s.gif</div>\n' % icon
+            html += u'<br/>%s</div>\n' % icon
         return html
 # ===========================================================================
