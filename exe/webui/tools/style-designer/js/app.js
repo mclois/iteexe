@@ -167,7 +167,7 @@ var $app = {
 			}
 			else  {
 				// Send POST request to update current style
- 			   var data = $app.collectAjaxData(content, nav, opener.$designer.config.styleName, 'saveStyle');
+ 			   var data = $app.collectAjaxData(content, nav, 'saveStyle');
  			   
  			   jQuery.ajax({
 					url: '/styleDesigner',
@@ -213,7 +213,7 @@ var $app = {
 						}
 						else  {
 							// Send POST request to update current style
-							var data = $app.collectAjaxData(content, nav, currentStyle, 'saveStyle');
+							var data = $app.collectAjaxData(content, nav, 'saveStyle');
 							   
 							jQuery.ajax({
 								url: '/styleDesigner',
@@ -1145,7 +1145,7 @@ var $app = {
 		// Menu height
 		if (typeof(w.myTheme.setNavHeight)!='undefined') w.myTheme.setNavHeight();
 	},
-	collectAjaxData : function(content, nav, style_name, op, copyFrom) {
+	collectAjaxData : function(content, nav, op, copyFrom) {
 		if (copyFrom == undefined) {
 			copyFrom = 'base';
 		}
@@ -1153,7 +1153,6 @@ var $app = {
 		
 		data.append('contentcss', content);
 		data.append('navcss', nav);
-		data.append('style_name', style_name);
 		if (op == 'saveStyle') {
 			// Style has already been created, send the current Style Id as its directory name
 			data.append('style_dirname', $app.getCurrentStyle());
@@ -1178,6 +1177,7 @@ var $app = {
 		}
 		
 		// Get style name, author and description
+		data.append('style_name', jQuery('#styleName').val());
 		data.append('author', jQuery('#authorName').val());
 		data.append('author_url', jQuery('#authorURL').val());
 		data.append('description', jQuery('#styleDescription').val());
@@ -1220,6 +1220,68 @@ var $app = {
             	   text: _('Continue'),
             	   handler: function() {
             		   var form = this.up('form').getForm(); // get the form panel
+            		   if (form.isValid()) { // make sure the form contains valid data before submitting
+            			   var data = $app.collectAjaxData(content, nav, 'createStyle', copyFrom);
+
+            			   jQuery.ajax({
+								url: '/styleDesigner',
+							    data: data,
+							    cache: false,
+							    contentType: false,
+							    processData: false,
+							    type: 'POST',
+								success: function(response, action) {
+									// Form request can success, even if the create/save operation failed
+									result = JSON.parse(response);
+									if (result.success) {
+										var message = result.message + '<br/>';
+										if (closeDesigner) {
+											message += _('Style Designer windows will be closed. ');
+										}
+										else {
+											message += _('Page will be reloaded. ');
+										}
+										Ext.Msg.alert(
+											'Success',
+											message,
+											function(btn, txt) {
+												createStyleWin.close();
+												$app.loadNewStyle(result.style_dirname);   
+												if (closeDesigner) {
+													opener.window.close();
+													window.close();
+												}
+											}
+										);
+									}
+									else {
+										Ext.Msg.alert(
+											'Failed',
+											result.message,
+											function(btn, txt) {
+												createStyleWin.close();
+											}
+										);
+									}   
+								},
+								failure: function(response, action) {
+									Ext.Msg.alert(
+										'Failed',
+										function(btn, txt) {
+											createStyleWin.close();
+										}
+									);
+								}
+            			   });
+                      }
+                      else { // display error alert if the data is invalid
+                          Ext.Msg.alert('Invalid Data', 'Please correct form errors.')
+                      }
+                  }
+              }
+          ]
+		});
+	},
             		   if (form.isValid()) { // make sure the form contains valid data before submitting
             			   var style_name = form.findField('style_name');
             			   var data = $app.collectAjaxData(content, nav, style_name.getValue(), 'createStyle', copyFrom);
