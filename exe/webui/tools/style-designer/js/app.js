@@ -167,7 +167,7 @@ var $app = {
 			}
 			else  {
 				// Send POST request to update current style
- 			   var data = $app.collectAjaxData(content, nav, opener.$designer.config.styleName, 'saveStyle');
+ 			   var data = $app.collectAjaxData(content, nav, 'saveStyle');
  			   
  			   jQuery.ajax({
 					url: '/styleDesigner',
@@ -213,7 +213,7 @@ var $app = {
 						}
 						else  {
 							// Send POST request to update current style
-							var data = $app.collectAjaxData(content, nav, currentStyle, 'saveStyle');
+							var data = $app.collectAjaxData(content, nav, 'saveStyle');
 							   
 							jQuery.ajax({
 								url: '/styleDesigner',
@@ -1145,7 +1145,7 @@ var $app = {
 		// Menu height
 		if (typeof(w.myTheme.setNavHeight)!='undefined') w.myTheme.setNavHeight();
 	},
-	collectAjaxData : function(content, nav, style_name, op, copyFrom) {
+	collectAjaxData : function(content, nav, op, copyFrom) {
 		if (copyFrom == undefined) {
 			copyFrom = 'base';
 		}
@@ -1153,7 +1153,6 @@ var $app = {
 		
 		data.append('contentcss', content);
 		data.append('navcss', nav);
-		data.append('style_name', style_name);
 		if (op == 'saveStyle') {
 			// Style has already been created, send the current Style Id as its directory name
 			data.append('style_dirname', $app.getCurrentStyle());
@@ -1178,6 +1177,7 @@ var $app = {
 		}
 		
 		// Get style name, author and description
+		data.append('style_name', jQuery('#styleName').val());
 		data.append('author', jQuery('#authorName').val());
 		data.append('author_url', jQuery('#authorURL').val());
 		data.append('description', jQuery('#styleDescription').val());
@@ -1221,8 +1221,7 @@ var $app = {
             	   handler: function() {
             		   var form = this.up('form').getForm(); // get the form panel
             		   if (form.isValid()) { // make sure the form contains valid data before submitting
-            			   var style_name = form.findField('style_name');
-            			   var data = $app.collectAjaxData(content, nav, style_name.getValue(), 'createStyle', copyFrom);
+            			   var data = $app.collectAjaxData(content, nav, 'createStyle', copyFrom);
 
             			   jQuery.ajax({
 								url: '/styleDesigner',
